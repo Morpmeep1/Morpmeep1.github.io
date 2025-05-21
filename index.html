@@ -43,9 +43,10 @@
     <button id="downloadButton">Download Lua File</button>
     <pre id="output">Lua script will appear here...</pre>
 
-    <script type="module">
-        import { Midi } from "https://cdn.jsdelivr.net/npm/@tonejs/midi@1.5.0";
+    <!-- Corrected MIDI Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@latest"></script>
 
+    <script>
         document.getElementById("convertButton").addEventListener("click", async () => {
             let file = document.getElementById("midiUpload").files[0];
             if (!file) {
