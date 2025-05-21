@@ -43,7 +43,7 @@
     <button id="downloadButton">Download Lua File</button>
     <pre id="output">Lua script will appear here...</pre>
 
-    <!-- Correct MIDI Processing Library -->
+    <!-- Load Tone.js MIDI -->
     <script src="https://unpkg.com/@tonejs/midi"></script>
 
     <script>
@@ -64,8 +64,10 @@
 
                 midi.tracks.forEach(track => {
                     track.notes.forEach(note => {
-                        let key = `keypress("${note.midi}", ${note.time}, bpm)\n`;
+                        let key = `keypress("${note.midi}", x, bpm)\n`;
+                        let restDuration = Math.round(note.duration * (60000 / bpm) / 1000); // ✅ Proper scaling
                         luaScript += key;
+                        luaScript += `rest(${restDuration}, bpm)\n`;
                     });
                 });
 
