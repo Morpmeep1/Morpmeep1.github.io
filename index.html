@@ -12,13 +12,17 @@
             text-align: center;
         }
         button {
-            background-color: #00cc00; /* Brighter green */
+            background-color: #00cc00; /* Bright green */
             color: white;
             border: none;
             padding: 10px 15px;
             margin: 5px;
             cursor: pointer;
             font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #009900; /* Slightly darker green */
         }
         pre {
             background: #004d00; /* Darker green */
@@ -26,6 +30,7 @@
             border-radius: 5px;
             text-align: left;
             white-space: pre-wrap;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -39,7 +44,7 @@
     <pre id="output">Lua script will appear here...</pre>
 
     <script type="module">
-        import { Midi } from "@tonejs/midi";
+        import { Midi } from "https://unpkg.com/@tonejs/midi";
 
         document.getElementById("convertButton").addEventListener("click", async () => {
             let file = document.getElementById("midiUpload").files[0];
@@ -76,15 +81,17 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // Copy to clipboard
+        // ✅ Copy to clipboard (this will now work!)
         document.getElementById("copyButton").addEventListener("click", () => {
             const luaCode = document.getElementById("output").textContent;
             navigator.clipboard.writeText(luaCode).then(() => {
                 alert("Lua script copied to clipboard!");
+            }).catch(() => {
+                alert("Failed to copy. Try manually selecting the text.");
             });
         });
 
-        // Download Lua file
+        // ✅ Download Lua file (fixed)
         document.getElementById("downloadButton").addEventListener("click", () => {
             const luaCode = document.getElementById("output").textContent;
             const blob = new Blob([luaCode], { type: "text/plain" });
@@ -96,6 +103,5 @@
             document.body.removeChild(a);
         });
     </script>
-    <script src="https://unpkg.com/@tonejs/midi"></script>
 </body>
 </html>
