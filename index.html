@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Particle Explosion</title>
+    <title>Massive Explosion Effect</title>
     <style>
         body {
             margin: 0;
@@ -13,17 +13,49 @@
 
         .particle {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 30px; /* Bigger particles */
+            height: 30px;
             border-radius: 50%;
-            opacity: 1;
             pointer-events: none;
-            animation: explode 0.6s ease-out forwards;
+            opacity: 1;
+            animation: explode 1.2s ease-out forwards;
+        }
+
+        .ripple {
+            position: absolute;
+            width: 80px; /* Larger initial ripple */
+            height: 80px;
+            border-radius: 50%;
+            pointer-events: none;
+            border: 5px solid;
+            opacity: 1;
+            animation: rippleEffect 1.5s ease-out forwards;
+        }
+
+        .shockwave {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            pointer-events: none;
+            border: 8px solid;
+            opacity: 0.8;
+            animation: shockwaveEffect 2s ease-out forwards;
         }
 
         @keyframes explode {
             0% { transform: scale(1); opacity: 1; }
             100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+        }
+
+        @keyframes rippleEffect {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        @keyframes shockwaveEffect {
+            0% { transform: scale(0.3); opacity: 1; }
+            100% { transform: scale(5); opacity: 0; }
         }
     </style>
 </head>
@@ -31,8 +63,8 @@
 
 <script>
 document.addEventListener("click", (event) => {
-    const numParticles = 20;
-    const colors = ["#FF6138", "#FFBE53", "#2980B9", "#282741"];
+    const numParticles = 50; // More particles
+    const colors = ["#FF6138", "#FFBE53", "#2980B9", "#282741", "#00FF7F", "#8A2BE2"];
     const color = colors[Math.floor(Math.random() * colors.length)];
 
     for (let i = 0; i < numParticles; i++) {
@@ -42,7 +74,7 @@ document.addEventListener("click", (event) => {
         document.body.appendChild(particle);
 
         const angle = Math.random() * 2 * Math.PI;
-        const distance = Math.random() * 50 + 30;
+        const distance = Math.random() * 150 + 100; // Increased explosion range
         const x = Math.cos(angle) * distance + "px";
         const y = Math.sin(angle) * distance + "px";
         particle.style.setProperty("--x", x);
@@ -50,8 +82,26 @@ document.addEventListener("click", (event) => {
         particle.style.left = event.clientX + "px";
         particle.style.top = event.clientY + "px";
 
-        setTimeout(() => particle.remove(), 600);
+        setTimeout(() => particle.remove(), 1200);
     }
+
+    const ripple = document.createElement("div");
+    ripple.classList.add("ripple");
+    ripple.style.borderColor = color;
+    ripple.style.left = event.clientX - 40 + "px";
+    ripple.style.top = event.clientY - 40 + "px";
+    document.body.appendChild(ripple);
+
+    setTimeout(() => ripple.remove(), 1500);
+
+    const shockwave = document.createElement("div");
+    shockwave.classList.add("shockwave");
+    shockwave.style.borderColor = color;
+    shockwave.style.left = event.clientX - 75 + "px";
+    shockwave.style.top = event.clientY - 75 + "px";
+    document.body.appendChild(shockwave);
+
+    setTimeout(() => shockwave.remove(), 2000);
 });
 </script>
 
