@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> Tim Mad - AI CAPTCHA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make Tim Mad - AI CAPTCHA</title>
   <style>
-    /* Overall page style */
+    /* Global styles */
     body {
       background: #f2f2f2;
       font-family: sans-serif;
@@ -17,51 +17,57 @@
     h2 {
       margin-bottom: 10px;
     }
-    /* Container for Tim’s avatar */
+    
+    /* Tim’s avatar container */
     #timContainer {
+      position: relative;
       width: 150px;
       height: 150px;
       margin-bottom: 20px;
     }
-    /* Tim’s base style */
+    
+    /* Tim’s head: a circle with a soft skin tone */
     #tim {
+      position: relative;
       width: 100%;
       height: 100%;
-      position: relative;
       border-radius: 50%;
       background: #fbe9d3;
       transition: transform 0.3s ease, background 0.3s ease;
     }
-    /* Messy hair — multiple tufts */
-    .hair {
+    
+    /* Bowl cut hair */
+    .bowlcut {
       position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 60px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .hair .tuft {
-      width: 30px;
+      top: 0;
+      left: 0;
+      width: 100%;
       height: 40px;
       background: #a67c52;
-      border-radius: 40% 60% 40% 60%;
-      transform: rotate(var(--angle));
+      border-top-left-radius: 50%;
+      border-top-right-radius: 50%;
     }
-    .tuft:nth-child(1) { --angle: -15deg; }
-    .tuft:nth-child(2) { --angle: 10deg; }
-    .tuft:nth-child(3) { --angle: -5deg; }
-
-    /* Face container */
+    
+    /* "Mushroom Head" label next to the bowl cut */
+    .label {
+      position: absolute;
+      top: 5px;
+      right: -80px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #a67c52;
+    }
+    
+    /* Face: centers the eyes and mouth */
     .face {
       position: absolute;
-      top: 50%;
+      top: 45%;
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
+      width: 100%;
     }
+    
     /* Eyes styling */
     .eye {
       width: 15px;
@@ -82,26 +88,109 @@
       background: black;
       border-radius: 50%;
     }
-    /* Mouth styling */
+    
+    /* Mouth styling – its shape will depend on Tim’s mood */
     .mouth {
       width: 40px;
       height: 20px;
       margin: 10px auto 0;
-      position: relative;
       transition: all 0.3s ease;
     }
-    /* Expressions */
-    .tim-calm .mouth { border-bottom: 3px solid black; border-radius: 0 0 20px 20px; }
-    .tim-annoyed .mouth { border-top: 3px solid black; border-radius: 0; }
-    .tim-furious .mouth { border-top: 3px solid black; border-radius: 20px 20px 0 0; animation: shake 0.5s infinite; }
-
-    /* Shake animation */
+    
+    /* Accessory: Beer can (right side) */
+    .beer {
+      position: absolute;
+      width: 15px;
+      height: 30px;
+      background: #d4af37;
+      border: 2px solid #aa8f00;
+      border-radius: 3px;
+      right: -20px;
+      bottom: 10px;
+    }
+    
+    /* Accessory: Surfboard (left side) */
+    .surfboard {
+      position: absolute;
+      width: 60px;
+      height: 15px;
+      background: #00ccff;
+      border-radius: 20px;
+      left: -30px;
+      bottom: -10px;
+      transform: rotate(-20deg);
+    }
+    
+    /* Tim’s facial expression state classes */
+    .tim-calm .mouth {
+      border-bottom: 3px solid black;
+      border-radius: 0 0 20px 20px;
+    }
+    .tim-slightly-annoyed .mouth {
+      border-bottom: 3px solid black;
+      border-radius: 0 0 10px 10px;
+    }
+    .tim-annoyed .mouth {
+      border-top: 3px solid black;
+      border-bottom: none;
+      border-radius: 0;
+    }
+    .tim-angry .mouth {
+      border-top: 3px solid black;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+    }
+    .tim-furious .mouth {
+      border-top: 3px solid black;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      animation: shake 0.5s infinite;
+    }
+    
     @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
+      0%   { transform: translateX(0); }
+      25%  { transform: translateX(-5px); }
+      50%  { transform: translateX(5px); }
+      75%  { transform: translateX(-5px); }
       100% { transform: translateX(0); }
+    }
+    
+    /* Chatbox styling */
+    #chatbox {
+      width: 400px;
+      height: 300px;
+      border: 2px solid #444;
+      padding: 10px;
+      overflow-y: auto;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    #chatbox div {
+      margin: 4px 0;
+    }
+    #userInput {
+      width: 390px;
+      padding: 5px;
+      font-size: 16px;
+    }
+    
+    /* "Made by Noah" rainbow text in the corner */
+    #credit {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      animation: rainbow 3s infinite linear;
+    }
+    @keyframes rainbow {
+      0%   { color: red; }
+      15%  { color: orange; }
+      30%  { color: yellow; }
+      45%  { color: green; }
+      60%  { color: blue; }
+      75%  { color: indigo; }
+      100% { color: violet; }
     }
   </style>
 </head>
@@ -109,17 +198,89 @@
   <h2>Make Tim Mad</h2>
   <div id="timContainer">
     <div id="tim" class="tim-calm">
-      <div class="hair">
-        <div class="tuft"></div>
-        <div class="tuft"></div>
-        <div class="tuft"></div>
-      </div>
+      <div class="bowlcut"></div>
+      <div class="label">Mushroom Head</div>
       <div class="face">
         <div class="eye left"></div>
         <div class="eye right"></div>
         <div class="mouth"></div>
       </div>
+      <div class="beer"></div>
+      <div class="surfboard"></div>
     </div>
   </div>
+  
+  <!-- Chat interface -->
+  <div id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="Say something to Tim..." />
+  
+  <!-- Credit text -->
+  <div id="credit">Made by Noah</div>
+  
+  <script>
+    // Get references to elements
+    const chatbox = document.getElementById("chatbox");
+    const userInput = document.getElementById("userInput");
+    const timElement = document.getElementById("tim");
+    
+    // Anger scale: 0 = Calm, 1 = Slightly Annoyed, 2 = Annoyed, 3 = Angry, 4 = Furious
+    let angerLevel = 0;
+    const timStates = [
+      "tim-calm",
+      "tim-slightly-annoyed",
+      "tim-annoyed",
+      "tim-angry",
+      "tim-furious"
+    ];
+    
+    // Responses for each state
+    const responses = [
+      "Tim: Hello, how can I help you today?",
+      "Tim: Hmm... that doesn't sound too friendly.",
+      "Tim: No beer? No surfing? I'm getting upset!",
+      "Tim: Dude, you need to chill! Where's my beer and surfboard?",
+      "Tim: That's it! I'm furious! Bring me my beer and let me surf!"
+    ];
+    
+    // Negative and positive trigger keywords
+    const negativeWords = ["stupid", "idiot", "hate", "annoying", "bad", "waste", "terrible", "no beer", "no surfing", "no surf"];
+    const positiveWords = ["nice", "thank", "please", "good", "awesome", "great", "calm", "kind", "friendly"];
+    
+    // Update Tim's anger level based on sentiment
+    function updateAngerLevel(message) {
+      const lowerMsg = message.toLowerCase();
+      let negative = negativeWords.some(word => lowerMsg.includes(word));
+      let positive = positiveWords.some(word => lowerMsg.includes(word));
+      
+      if (negative && !positive) {
+        angerLevel = Math.min(angerLevel + 1, timStates.length - 1);
+      } else if (positive && !negative) {
+        angerLevel = Math.max(angerLevel - 1, 0);
+      }
+      // Mixed or neutral messages do not change the level.
+    }
+    
+    // Add a new message to the chatbox
+    function addMessage(message, isUser = false) {
+      const div = document.createElement("div");
+      div.textContent = (isUser ? "You: " : "") + message;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+    
+    // Listen for Enter key on the input
+    userInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        const text = userInput.value.trim();
+        if (!text) return;
+        addMessage(text, true);
+        userInput.value = "";
+        
+        updateAngerLevel(text);
+        timElement.className = timStates[angerLevel];
+        addMessage(responses[angerLevel]);
+      }
+    });
+  </script>
 </body>
 </html>
