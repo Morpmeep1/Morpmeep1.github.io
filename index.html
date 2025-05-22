@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Make Tim Mad – CAPTCHA Edition</title>
+  <title>Make Tim Mad – Ultimate CAPTCHA Upgrade</title>
   <style>
-    /* Global styles */
+    /* Global Styles */
     body {
       margin: 0;
       padding: 20px;
@@ -80,6 +80,8 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
+    
+    /* Bowl Cut */
     .bowlcut {
       position: absolute;
       top: 0;
@@ -90,14 +92,21 @@
       border-top-left-radius: 50%;
       border-top-right-radius: 50%;
     }
-    .label {
+    
+    /* Mushroom Head Label with Rainbow Text & Emoji */
+    .mushroom-label {
       position: absolute;
       top: 5px;
-      right: -80px;
+      right: -100px;
       font-size: 14px;
       font-weight: bold;
-      color: #a67c52;
+      /* Rainbow gradient text */
+      background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+    
+    /* Face and Eyes */
     .face {
       position: absolute;
       top: 45%;
@@ -126,6 +135,8 @@
       background: black;
       border-radius: 50%;
     }
+    
+    /* Mouth styling changes based on mood */
     .mouth {
       width: 40px;
       height: 20px;
@@ -133,31 +144,53 @@
       transition: all 0.3s ease;
     }
     
-    /* Detailed Accessories */
+    /* ------------------------------
+         Detailed Accessories
+    -------------------------------*/
+    /* Beer Can (Noah's Juice) */
     .beer {
       position: absolute;
-      width: 15px;
-      height: 30px;
+      width: 20px;
+      height: 40px;
       background: linear-gradient(135deg, #d4af37, #b8860b);
       border: 2px solid #aa8f00;
       border-radius: 3px;
-      right: -20px;
+      right: -25px;
       bottom: 10px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .surfboard {
-      position: absolute;
-      width: 60px;
-      height: 15px;
-      background: linear-gradient(135deg, #00ccff, #0099cc);
-      border-radius: 20px;
-      left: -30px;
-      bottom: -10px;
-      transform: rotate(-20deg);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: white;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      padding: 2px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
     
-    /* Tim's mood classes */
+    /* Surfboard (Ellipse with "Surfboard" text) */
+    .surfboard {
+      position: absolute;
+      width: 100px;
+      height: 40px;
+      background: linear-gradient(135deg, #00ccff, #0099cc);
+      border-radius: 50%;
+      left: -50px;
+      bottom: -20px;
+      transform: rotate(-20deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      font-weight: bold;
+    }
+    
+    /* ---------------------------------
+       Tim's Mood (Facial Expressions)
+    ----------------------------------- */
     .tim-calm .mouth {
       border-bottom: 3px solid black;
       border-radius: 0 0 20px 20px;
@@ -239,7 +272,7 @@
   </style>
 </head>
 <body>
-  <!-- reCAPTCHA Style Box -->
+  <!-- reCAPTCHA–Style Box -->
   <div id="captchaBox">
     <input type="checkbox" id="notARobot">
     <label for="notARobot">
@@ -248,19 +281,24 @@
     </label>
   </div>
   
-  <!-- Hidden Tim Section (slides in when reCAPTCHA is solved) -->
+  <!-- Hidden Tim Section (slides into view when reCAPTCHA is solved) -->
   <div id="timSection">
     <div id="timContainer">
       <div id="tim" class="tim-calm">
         <div class="bowlcut"></div>
-        <div class="label">Mushroom Head</div>
+        <!-- Mushroom Head Label with Rainbow Text and Skull Emoji -->
+        <div class="mushroom-label">Mushroom Head 💀🌈</div>
         <div class="face">
           <div class="eye left"></div>
           <div class="eye right"></div>
           <div class="mouth"></div>
         </div>
-        <div class="beer"></div>
-        <div class="surfboard"></div>
+        <!-- Beer Can (Noah's Juice) with Label -->
+        <div class="beer">Noah's
+          <br>Juice
+        </div>
+        <!-- Surfboard (Ellipse) with Label -->
+        <div class="surfboard">Surfboard</div>
       </div>
     </div>
     
@@ -273,9 +311,9 @@
   <div id="credit">Made by Noah</div>
   
   <script>
-    /* -------------------------
+    /* -------------------------------------
        Tim's Mood and Trigger Logic
-    -------------------------- */
+    ----------------------------------------*/
     let angerLevel = 0;
     let negativeCount = 0;
     const timStates = ["tim-calm", "tim-slightly-annoyed", "tim-annoyed", "tim-angry", "tim-furious"];
@@ -287,17 +325,17 @@
       "SECRET RAGE MODE ACTIVATED! I've had enough!"
     ];
     
-    // A list of positive phrases (enriched with extra descriptors)
+    // A comprehensive list of positive phrases.
     const positiveWords = [
       "nice", "thank", "thanks", "please", "good", "awesome", "great",
       "calm", "kind", "friendly", "excellent", "wonderful", "superb", 
       "amazing", "charming", "delightful", "appreciate", "respectful", 
-      "supportive", "encouraging", "optimistic", "cheerful",
-      "fantastic", "incredible", "marvelous", "splendid", "radiant", 
-      "admirable", "commendable", "uplifting", "heartening", "mellow"
+      "supportive", "encouraging", "optimistic", "cheerful", "fantastic", 
+      "incredible", "marvelous", "splendid", "radiant", "admirable", 
+      "commendable", "uplifting", "heartening", "mellow"
     ];
     
-    // A list of negative (non-swear) phrases
+    // A list of negative (non-swear) phrases.
     let negativeWords = [
       "stupid", "idiot", "hate", "annoying", "bad", "waste", "terrible",
       "useless", "dumb", "lousy", "frustrating", "disappointing", "awful",
@@ -318,14 +356,14 @@
       let foundNegative = false;
       let foundPositive = false;
       
-      // Look for any negative trigger in the message.
+      // Check for any negative words.
       for (const word of negativeWords) {
         if (lowerMsg.includes(word)) {
           foundNegative = true;
           break;
         }
       }
-      // Look for any positive phrase.
+      // Check for any positive phrases.
       for (const word of positiveWords) {
         if (lowerMsg.includes(word)) {
           foundPositive = true;
@@ -339,13 +377,14 @@
       } else if (foundPositive && !foundNegative) {
         angerLevel = Math.max(angerLevel - 1, 0);
       }
-      // Force "secret rage mode" if too many negative triggers accumulate.
-      if (negativeCount > 5) {
+      
+      // Force secret rage mode if many negatives occur.
+      if (negativeCount > 5) { 
         angerLevel = timStates.length - 1;
       }
     }
     
-    // Append message into the chatbox.
+    // Append a message to the chatbox.
     function addMessage(message, isUser = false) {
       const chatbox = document.getElementById("chatbox");
       const div = document.createElement("div");
@@ -354,13 +393,13 @@
       chatbox.scrollTop = chatbox.scrollHeight;
     }
     
-    // DOM Elements
+    // DOM Elements.
     const userInput = document.getElementById("userInput");
     const timElement = document.getElementById("tim");
     const captchaCheckbox = document.getElementById("notARobot");
     const timSection = document.getElementById("timSection");
     
-    // Show the Tim section with a smooth slide when the checkbox is checked.
+    // When the checkbox is checked, reveal the Tim section with a slide-in animation.
     captchaCheckbox.addEventListener("change", function() {
       if (this.checked) {
         timSection.classList.add("show");
@@ -369,7 +408,7 @@
       }
     });
     
-    // Listen for Enter key in the chat input.
+    // Listen for the Enter key in the chat input.
     userInput.addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         const text = userInput.value.trim();
