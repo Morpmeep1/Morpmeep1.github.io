@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EEEETim Singing & Dancing Visualizer</title>
+  <title>Tim Singing & Dancing Visualizer</title>
   <style>
     /* Basic Page Styles */
     body {
@@ -24,7 +24,7 @@
     #timContainer {
       position: relative;
       width: 150px;
-      height: 350px; /* Height covers head + body + legs */
+      height: 350px; /* Overall height covers head, body, and legs */
       animation: dance 1s infinite ease-in-out;
     }
     /* Dance animation applied to the whole figure */
@@ -33,7 +33,7 @@
       50%  { transform: translateY(-10px) rotate(2deg); }
       100% { transform: translateY(0px) rotate(0deg); }
     }
-    /* Head – now placed absolutely at the top */
+    /* Head – positioned at the top of the container */
     .head {
       position: absolute;
       top: 0;
@@ -66,11 +66,12 @@
       -webkit-text-fill-color: transparent;
       white-space: nowrap;
     }
+    /* Position the face container using top instead of bottom */
     .face {
       position: absolute;
-      bottom: 25px; /* Position near the lower third of the head */
+      top: 65px; /* Adjust this value as needed to raise/lower the eyes & mouth */
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, 0);
       width: 100%;
       text-align: center;
     }
@@ -94,8 +95,7 @@
       background: black;
       border-radius: 50%;
     }
-    /* Mouth – starting closed at 6px height.
-       The JS will increase its height dramatically with louder audio. */
+    /* Mouth – starts closed at 6px height; JS will dramatically increase height */
     .mouth {
       width: 40px;
       height: 6px;
@@ -105,13 +105,13 @@
       transition: height 0.1s linear;
       transform-origin: center top;
     }
-    /* Body container positioned so that it touches the head */
+    /* Body container positioned so it touches the head */
     .body {
       position: absolute;
-      top: 150px;  /* Directly below the 150px head */
+      top: 140px;  /* Slightly higher than before to attach the torso to the head */
       left: 0;
       width: 150px;
-      height: 200px;
+      height: 210px;
       background: transparent;
     }
     /* White singlet for torso */
@@ -243,13 +243,13 @@
         }
         const average = sum / dataArray.length;
         
-        // Compute a scale factor that makes the mouth open dramatically.
-        // When quiet, scale = 1 (mouth height = 6px). For louder audio, add average/30.
-        // Cap at a maximum factor of 10.
+        /* Compute a scale factor for the mouth:
+           - Starts at a factor of 1 (closed)
+           - Add average/30 to exaggerate the opening
+           - Cap the factor at 10 (so maximum mouth height is 6px * 10 = 60px) */
         let scaleFactor = 1 + (average / 30);
         scaleFactor = Math.min(scaleFactor, 10.0);
         
-        // Compute new mouth height.
         const newHeight = 6 * scaleFactor;
         mouth.style.height = newHeight + "px";
       }
