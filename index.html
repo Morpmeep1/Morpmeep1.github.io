@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tim Singing & Dancing Visualizer</title>
+  <title>TTTTTTTTTTTim Singing & Dancing Visualizer</title>
   <style>
     /* Basic Page Styles */
     body {
@@ -31,6 +31,7 @@
       position: relative;
       width: 150px;
       height: 350px; /* Overall height covers head + body + legs */
+      /* This CSS animation ensures that the full figure moves as one unit. */
       animation: dance 1s infinite ease-in-out;
     }
     /* Dance animation applied to the whole figure */
@@ -75,7 +76,7 @@
     /* Face positioned so that eyes and mouth are in an appropriate spot */
     .face {
       position: absolute;
-      top: 65px; /* Adjusted upward */
+      top: 65px; /* Adjusted upward for better placement on the head */
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -114,7 +115,7 @@
     /* Body container positioned so it touches the head */
     .body {
       position: absolute;
-      top: 140px;  /* Adjusted to attach directly to the head */
+      top: 140px;  /* Adjusted so the torso attaches directly to the head */
       left: 0;
       width: 150px;
       height: 210px;
@@ -234,26 +235,22 @@
     let audio, audioContext, analyser, source;
     let dataArray, bufferLength;
     
-    // For YouTube simulation, we'll use a sine function to simulate amplitude.
-    
+    // For simulating YouTube amplitude
     const fileInput = document.getElementById("fileInput");
     const youtubeInput = document.getElementById("youtubeInput");
     const loadYouTubeButton = document.getElementById("loadYouTubeButton");
     const youtubeContainer = document.getElementById("youtubeContainer");
     const mouth = document.getElementById("mouth");
     
-    // When a file is chosen, switch to file mode and use actual audio analysis.
+    // When a local file is chosen, switch to file mode and use the Web Audio API.
     fileInput.addEventListener("change", function() {
       sourceMode = "file";
       youtubeMode = false;
-      // Hide YouTube container if visible.
       youtubeContainer.style.display = "none";
-      // If a file is loaded, set up the audio analysis.
       const file = this.files[0];
       if (!file) return;
       const url = URL.createObjectURL(file);
       
-      // Create an audio element and play.
       if (audio) {
         audio.pause();
       }
@@ -276,12 +273,11 @@
     
     // YouTube IFrame API variables.
     let ytPlayer;
-    // This function will be called by the YouTube IFrame API when it's ready.
     function onYouTubeIframeAPIReady() {
-      // We'll create the player later when a YouTube link is provided.
+      // We'll create the player when the link is provided.
     }
     
-    // Load YouTube video based on link input.
+    // Load a YouTube video based on the link.
     loadYouTubeButton.addEventListener("click", function() {
       const url = youtubeInput.value.trim();
       if (!url) return;
@@ -292,10 +288,8 @@
       }
       sourceMode = "youtube";
       youtubeMode = true;
-      // Show the YouTube container and load the video.
       youtubeContainer.style.display = "block";
       
-      // If player already exists, load the new video.
       if (ytPlayer) {
         ytPlayer.loadVideoById(videoId);
       } else {
@@ -318,38 +312,50 @@
       }
     });
     
-    // Utility: extract YouTube Video ID from URL.
+    // Utility: extract YouTube video ID from URL.
     function extractVideoId(url) {
       const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
       const match = url.match(regExp);
       return (match && match[7].length === 11) ? match[7] : null;
     }
     
-    // Animation loop
+    // Animation loop that updates Tim’s mouth based on audio/simulation.
     function animate() {
       requestAnimationFrame(animate);
       
       let average = 0;
       if (!youtubeMode && analyser) {
-        // Use the actual audio data from a local file.
+        // Local MP3 mode: use actual Web Audio API analysis.
         analyser.getByteFrequencyData(dataArray);
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
           sum += dataArray[i];
         }
         average = sum / dataArray.length;
+        // Use a more sensitive ratio for MP3 mode to make the mouth open HUGE.
+        // Base factor starts at 1, then add average/18; cap it at 12.
+        let scaleFactor = 1 + (average / 18);
+        scaleFactor = Math.min(scaleFactor, 12.0);
+        const newHeight = 6 * scaleFactor;
+        mouth.style.height = newHeight + "px";
       } else if (youtubeMode) {
-        // For YouTube mode, simulate amplitude with a sine wave.
-        // (Note: Due to cross-origin restrictions, we cannot analyze YouTube audio directly.)
-        average = 50 + 40 * Math.abs(Math.sin(performance.now() / 400));
+        // YouTube mode: simulate amplitude using the YouTube player's current time.
+        let currentTime = (ytPlayer && typeof ytPlayer.getCurrentTime === 'function')
+                          ? ytPlayer.getCurrentTime() 
+                          : performance.now() / 1000;
+        // Simulate a beat roughly at 120 BPM (2 beats per second)
+        let beatFrequency = 2;
+        let sineValue = Math.abs(Math.sin(currentTime * Math.PI * beatFrequency));
+        // Base amplitude plus random jitter for dynamic variation.
+        let baseAmplitude = 50 + 30 * sineValue;
+        let randomJitter = Math.random() * 20;
+        average = baseAmplitude + randomJitter;
+        // For YouTube, use a more sensitive ratio as well.
+        let scaleFactor = 1 + (average / 12);
+        scaleFactor = Math.min(scaleFactor, 12.0);
+        const newHeight = 6 * scaleFactor;
+        mouth.style.height = newHeight + "px";
       }
-      
-      // Compute a scale factor for the mouth:
-      // Use a dramatic multiplier so that the mouth opens very big.
-      let scaleFactor = 1 + (average / 30);
-      scaleFactor = Math.min(scaleFactor, 10.0);
-      const newHeight = 6 * scaleFactor;
-      mouth.style.height = newHeight + "px";
     }
     
     animate();
