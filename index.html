@@ -17,22 +17,24 @@
       font-family: sans-serif;
       overflow-x: hidden;
     }
-    
     #fileInput {
       margin: 20px;
     }
-    
-    /* Container for Tim’s head and body */
+    /* Container for the entire Tim character */
     #timContainer {
       position: relative;
       width: 150px;
-      /* Increase container height to accommodate head and full body */
-      height: 300px;
-      margin: 20px auto;
+      height: 350px; /* Enough height for head, body, and legs */
+      animation: dance 1s infinite ease-in-out;
     }
-    
-    /* Tim’s Head Styles */
-    #tim {
+    /* Dance animation applied to the whole figure */
+    @keyframes dance {
+      0%   { transform: translateY(0px) rotate(0deg); }
+      50%  { transform: translateY(-10px) rotate(2deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    /* Tim's head */
+    .head {
       position: relative;
       width: 150px;
       height: 150px;
@@ -40,9 +42,8 @@
       background: #fbe9d3;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       overflow: hidden;
+      margin: 0 auto;
     }
-    
-    /* Bowl Cut */
     .bowlcut {
       position: absolute;
       top: 0;
@@ -53,8 +54,6 @@
       border-top-left-radius: 50%;
       border-top-right-radius: 50%;
     }
-    
-    /* Rainbow Mushroom Label */
     .mushroom-label {
       position: absolute;
       top: 5px;
@@ -66,8 +65,6 @@
       -webkit-text-fill-color: transparent;
       white-space: nowrap;
     }
-    
-    /* Face (Eyes and Mouth container) */
     .face {
       position: absolute;
       top: 45%;
@@ -76,8 +73,6 @@
       width: 100%;
       text-align: center;
     }
-    
-    /* Eyes */
     .eye {
       width: 15px;
       height: 15px;
@@ -98,38 +93,70 @@
       background: black;
       border-radius: 50%;
     }
-    
-    /* Mouth - starts "closed" (small height) */
+    /* Mouth - starts closed with a height of 6px */
     .mouth {
       width: 40px;
-      height: 6px;  /* closed mouth height */
+      height: 6px;
       margin: 10px auto 0;
       background: #900;
       border-radius: 0 0 20px 20px;
-      transition: transform 0.1s linear, height 0.1s linear;
+      transition: height 0.1s linear;
       transform-origin: center top;
     }
-    
-    /* Tim's Full Body - a simple rectangle with dancing animation */
-    #timBody {
+    /* Body container (holds clothing and limbs) */
+    .body {
+      position: relative;
+      width: 150px;
+      height: 200px;
+      margin-top: 10px;
+    }
+    /* White singlet for torso */
+    .singlet {
       position: absolute;
-      top: 160px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 120px;
+      top: 10px;
+      left: 25px;
+      width: 100px;
+      height: 80px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+    }
+    /* Arms */
+    .arm {
+      position: absolute;
+      width: 20px;
+      height: 60px;
       background: #fbe9d3;
+      border: 2px solid #ccc;
       border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      animation: dance 1s infinite ease-in-out;
     }
-    
-    @keyframes dance {
-      0%   { transform: translateX(-50%) translateY(0px) rotate(0deg); }
-      50%  { transform: translateX(-50%) translateY(-10px) rotate(5deg); }
-      100% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
+    .leftArm {
+      top: 10px;
+      left: 0;
+      transform: rotate(10deg);
     }
-    
+    .rightArm {
+      top: 10px;
+      right: 0;
+      transform: rotate(-10deg);
+    }
+    /* Legs */
+    .leg {
+      position: absolute;
+      width: 20px;
+      height: 60px;
+      background: #fbe9d3;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+    }
+    .leftLeg {
+      bottom: 0;
+      left: 40px;
+    }
+    .rightLeg {
+      bottom: 0;
+      right: 40px;
+    }
     /* Credit Styling */
     #credit {
       position: fixed;
@@ -146,18 +173,26 @@
   <input type="file" id="fileInput" accept="audio/mp3">
   
   <div id="timContainer">
-    <!-- Tim's Head -->
     <div id="tim">
-      <div class="bowlcut"></div>
-      <div class="mushroom-label">Mushroom Head 💀🌈</div>
-      <div class="face">
-        <div class="eye left"></div>
-        <div class="eye right"></div>
-        <div class="mouth" id="mouth"></div>
+      <!-- Head Section -->
+      <div class="head">
+        <div class="bowlcut"></div>
+        <div class="mushroom-label">Mushroom Head 💀🌈</div>
+        <div class="face">
+          <div class="eye left"></div>
+          <div class="eye right"></div>
+          <div class="mouth" id="mouth"></div>
+        </div>
+      </div>
+      <!-- Body Section -->
+      <div class="body">
+        <div class="singlet"></div>
+        <div class="arm leftArm"></div>
+        <div class="arm rightArm"></div>
+        <div class="leg leftLeg"></div>
+        <div class="leg rightLeg"></div>
       </div>
     </div>
-    <!-- Tim's Dancing Body -->
-    <div id="timBody"></div>
   </div>
   
   <div id="credit">Made by Noah</div>
@@ -166,13 +201,13 @@
     document.addEventListener("DOMContentLoaded", function() {
       const fileInput = document.getElementById("fileInput");
       const mouth = document.getElementById("mouth");
-
+      
       let audio, audioContext, analyser, source;
       let dataArray, bufferLength;
-
+      
       fileInput.addEventListener("change", function() {
         const file = this.files[0];
-        if(!file) return;
+        if (!file) return;
         const url = URL.createObjectURL(file);
         
         // Create an audio element and play the file.
@@ -181,20 +216,20 @@
         audio.loop = true;
         audio.play();
         
-        // Set up the Web Audio API.
+        // Set up Web Audio API.
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
-
+        
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
         
         animate();
       });
-
+      
       function animate() {
         requestAnimationFrame(animate);
         analyser.getByteFrequencyData(dataArray);
@@ -206,23 +241,23 @@
         }
         const average = sum / dataArray.length;
         
-        // Compute a scale for the mouth. When it's very quiet, the mouth stays closed.
+        // Map the average amplitude to a scale factor.
+        // When quiet, Tim’s mouth remains nearly closed (height = 6px)
+        // Otherwise, increase the factor so the mouth opens bigger.
         let scaleFactor;
         if (average < 20) {
-          // Very low volume, mouth is closed.
           scaleFactor = 0.3;
         } else {
-          // As average increases, the mouth opens. Start from a small closed state (0.3) and add.
-          scaleFactor = 0.3 + (average / 300);
+          // Increase sensitivity: use average/150 instead of average/300,
+          // then add a base value (0.3) so it starts from a closed state.
+          scaleFactor = 0.3 + (average / 150);
         }
-        scaleFactor = Math.min(scaleFactor, 2.0);  // cap the scaling
-
-        // Adjust the mouth height accordingly.
-        // Default closed height is 6px, so we multiply that.
+        // Cap the scale factor to a higher value for a more dramatic open.
+        scaleFactor = Math.min(scaleFactor, 3.0);
+        
+        // Compute new mouth height.
         const newHeight = 6 * scaleFactor;
         mouth.style.height = newHeight + "px";
-        // Optionally, you can also use scaleY transform:
-        // mouth.style.transform = `scaleY(${scaleFactor})`;
       }
     });
   </script>
