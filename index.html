@@ -17,14 +17,20 @@
       font-family: sans-serif;
       overflow-x: hidden;
     }
-    #fileInput {
+    .controls {
       margin: 20px;
+      text-align: center;
+    }
+    input, button {
+      padding: 8px;
+      margin: 4px;
+      font-size: 14px;
     }
     /* Container for the entire Tim character */
     #timContainer {
       position: relative;
       width: 150px;
-      height: 350px; /* Overall height covers head, body, and legs */
+      height: 350px; /* Overall height covers head + body + legs */
       animation: dance 1s infinite ease-in-out;
     }
     /* Dance animation applied to the whole figure */
@@ -66,12 +72,12 @@
       -webkit-text-fill-color: transparent;
       white-space: nowrap;
     }
-    /* Position the face container using top instead of bottom */
+    /* Face positioned so that eyes and mouth are in an appropriate spot */
     .face {
       position: absolute;
-      top: 65px; /* Adjust this value as needed to raise/lower the eyes & mouth */
+      top: 65px; /* Adjusted upward */
       left: 50%;
-      transform: translate(-50%, 0);
+      transform: translateX(-50%);
       width: 100%;
       text-align: center;
     }
@@ -95,7 +101,7 @@
       background: black;
       border-radius: 50%;
     }
-    /* Mouth – starts closed at 6px height; JS will dramatically increase height */
+    /* Mouth – starts closed at 6px; JS will dramatically increase its height */
     .mouth {
       width: 40px;
       height: 6px;
@@ -108,7 +114,7 @@
     /* Body container positioned so it touches the head */
     .body {
       position: absolute;
-      top: 140px;  /* Slightly higher than before to attach the torso to the head */
+      top: 140px;  /* Adjusted to attach directly to the head */
       left: 0;
       width: 150px;
       height: 210px;
@@ -161,6 +167,13 @@
       bottom: 0;
       right: 25px;
     }
+    /* YouTube player container (for YouTube mode) */
+    #youtubeContainer {
+      width: 300px;
+      height: 170px;
+      margin: 20px auto;
+      display: none;
+    }
     /* Credit Styling */
     #credit {
       position: fixed;
@@ -172,15 +185,25 @@
       z-index: 100;
     }
   </style>
+  <!-- Load YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-  <input type="file" id="fileInput" accept="audio/mp3">
+  <div class="controls">
+    <!-- File input for local MP3 -->
+    <input type="file" id="fileInput" accept="audio/mp3">
+    <br>
+    <!-- Input for YouTube link and load button -->
+    <input type="text" id="youtubeInput" placeholder="Enter YouTube link">
+    <button id="loadYouTubeButton">Load YouTube</button>
+  </div>
   
+  <!-- Tim visualizer container -->
   <div id="timContainer">
     <!-- Head -->
     <div class="head">
       <div class="bowlcut"></div>
-      <div class="mushroom-label"> </div>
+      <div class="mushroom-label">Mushroom Head 💀🌈</div>
       <div class="face">
         <div class="eye left"></div>
         <div class="eye right"></div>
@@ -197,63 +220,139 @@
     </div>
   </div>
   
+  <!-- YouTube player container -->
+  <div id="youtubeContainer"></div>
+  
   <div id="credit">Made by Noah</div>
   
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const fileInput = document.getElementById("fileInput");
-      const mouth = document.getElementById("mouth");
+    // Global mode: either "file" or "youtube"
+    let sourceMode = "file";
+    let youtubeMode = false; // true if using YouTube link (simulated amplitude)
+    
+    // Variables for file audio analysis:
+    let audio, audioContext, analyser, source;
+    let dataArray, bufferLength;
+    
+    // For YouTube simulation, we'll use a sine function to simulate amplitude.
+    
+    const fileInput = document.getElementById("fileInput");
+    const youtubeInput = document.getElementById("youtubeInput");
+    const loadYouTubeButton = document.getElementById("loadYouTubeButton");
+    const youtubeContainer = document.getElementById("youtubeContainer");
+    const mouth = document.getElementById("mouth");
+    
+    // When a file is chosen, switch to file mode and use actual audio analysis.
+    fileInput.addEventListener("change", function() {
+      sourceMode = "file";
+      youtubeMode = false;
+      // Hide YouTube container if visible.
+      youtubeContainer.style.display = "none";
+      // If a file is loaded, set up the audio analysis.
+      const file = this.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
       
-      let audio, audioContext, analyser, source;
-      let dataArray, bufferLength;
+      // Create an audio element and play.
+      if (audio) {
+        audio.pause();
+      }
+      audio = new Audio(url);
+      audio.crossOrigin = "anonymous";
+      audio.loop = true;
+      audio.play();
       
-      fileInput.addEventListener("change", function() {
-        const file = this.files[0];
-        if (!file) return;
-        const url = URL.createObjectURL(file);
-        
-        // Create an audio element and play the file.
-        audio = new Audio(url);
-        audio.crossOrigin = "anonymous";
-        audio.loop = true;
-        audio.play();
-        
-        // Set up the Web Audio API.
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        
-        source = audioContext.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        
-        animate();
-      });
+      // Set up Web Audio API.
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      bufferLength = analyser.frequencyBinCount;
+      dataArray = new Uint8Array(bufferLength);
       
-      function animate() {
-        requestAnimationFrame(animate);
+      source = audioContext.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+    });
+    
+    // YouTube IFrame API variables.
+    let ytPlayer;
+    // This function will be called by the YouTube IFrame API when it's ready.
+    function onYouTubeIframeAPIReady() {
+      // We'll create the player later when a YouTube link is provided.
+    }
+    
+    // Load YouTube video based on link input.
+    loadYouTubeButton.addEventListener("click", function() {
+      const url = youtubeInput.value.trim();
+      if (!url) return;
+      const videoId = extractVideoId(url);
+      if (!videoId) {
+        alert("Invalid YouTube link.");
+        return;
+      }
+      sourceMode = "youtube";
+      youtubeMode = true;
+      // Show the YouTube container and load the video.
+      youtubeContainer.style.display = "block";
+      
+      // If player already exists, load the new video.
+      if (ytPlayer) {
+        ytPlayer.loadVideoById(videoId);
+      } else {
+        ytPlayer = new YT.Player('youtubeContainer', {
+          height: '170',
+          width: '300',
+          videoId: videoId,
+          playerVars: {
+            autoplay: 1,
+            controls: 1,
+            modestbranding: 1,
+            rel: 0
+          },
+          events: {
+            'onReady': function(e) {
+              e.target.playVideo();
+            }
+          }
+        });
+      }
+    });
+    
+    // Utility: extract YouTube Video ID from URL.
+    function extractVideoId(url) {
+      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[7].length === 11) ? match[7] : null;
+    }
+    
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      let average = 0;
+      if (!youtubeMode && analyser) {
+        // Use the actual audio data from a local file.
         analyser.getByteFrequencyData(dataArray);
-        
-        // Calculate the average amplitude.
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
           sum += dataArray[i];
         }
-        const average = sum / dataArray.length;
-        
-        /* Compute a scale factor for the mouth:
-           - Starts at a factor of 1 (closed)
-           - Add average/30 to exaggerate the opening
-           - Cap the factor at 10 (so maximum mouth height is 6px * 10 = 60px) */
-        let scaleFactor = 1 + (average / 30);
-        scaleFactor = Math.min(scaleFactor, 10.0);
-        
-        const newHeight = 6 * scaleFactor;
-        mouth.style.height = newHeight + "px";
+        average = sum / dataArray.length;
+      } else if (youtubeMode) {
+        // For YouTube mode, simulate amplitude with a sine wave.
+        // (Note: Due to cross-origin restrictions, we cannot analyze YouTube audio directly.)
+        average = 50 + 40 * Math.abs(Math.sin(performance.now() / 400));
       }
-    });
+      
+      // Compute a scale factor for the mouth:
+      // Use a dramatic multiplier so that the mouth opens very big.
+      let scaleFactor = 1 + (average / 30);
+      scaleFactor = Math.min(scaleFactor, 10.0);
+      const newHeight = 6 * scaleFactor;
+      mouth.style.height = newHeight + "px";
+    }
+    
+    animate();
   </script>
 </body>
 </html>
