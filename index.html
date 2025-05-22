@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Visualizer Ripple</title>
+  <title>Adaptive Music Visualizer Ripple</title>
   <style>
     /* Basic Page Styles */
     body {
@@ -24,34 +24,55 @@
       border: 1px solid #222;
       display: block;
     }
+    /* Credit Styling */
+    #credit {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      z-index: 100;
+    }
   </style>
 </head>
 <body>
   <input type="file" id="fileInput" accept="audio/mp3">
   <canvas id="canvas"></canvas>
+  <div id="credit">Made by Noah</div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const fileInput = document.getElementById('fileInput');
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
+    document.addEventListener("DOMContentLoaded", function() {
+      const fileInput = document.getElementById("fileInput");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
 
-      // Set canvas size to fill the window.
+      // Set canvas size to match the window.
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      let audioContext, analyser, source, audio;
+      let audio, audioContext, analyser, source;
       let dataArray, bufferLength;
-      const ripples = [];
+      let ripples = [];
       let lastRippleTime = 0;
-      const minRippleInterval = 200; // Minimum ms between new ripples
+      // Lower the interval between ripples for more precise visual response.
+      const minRippleInterval = 100;
 
-      fileInput.addEventListener('change', function() {
+      // Helper to compute an average over a slice of an array.
+      function getAverage(arr, start, end) {
+        let sum = 0;
+        for (let i = start; i < end; i++) {
+          sum += arr[i];
+        }
+        return sum / (end - start);
+      }
+
+      fileInput.addEventListener("change", function() {
         const file = this.files[0];
         if (!file) return;
         const url = URL.createObjectURL(file);
 
-        // Create an HTML Audio element to play the file.
+        // Create and configure the audio element.
         audio = new Audio(url);
         audio.crossOrigin = "anonymous";
         audio.loop = true;
@@ -60,7 +81,7 @@
         // Set up the Web Audio API.
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
+        analyser.fftSize = 256; // yields 128 frequency bins.
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
 
@@ -71,53 +92,49 @@
         animate();
       });
 
-      // Animation function that continuously draws on the canvas.
       function animate() {
         requestAnimationFrame(animate);
         analyser.getByteFrequencyData(dataArray);
 
-        // Calculate an average volume level from frequency data.
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          sum += dataArray[i];
-        }
-        const average = sum / dataArray.length;
-
-        // If the average amplitude exceeds a threshold and enough time has passed,
-        // create a new ripple at the center of the canvas.
-        const threshold = 150;
+        // Compute the bass average using first 10 indices.
+        const bassCount = 10;
+        const bassAvg = getAverage(dataArray, 0, bassCount);
         const currentTime = performance.now();
-        if (average > threshold && currentTime - lastRippleTime > minRippleInterval) {
+        const bassThreshold = 60; // Lower threshold for bass-based beat detection
+
+        // If bass levels exceed the threshold and enough time has passed, create a new ripple.
+        if (bassAvg > bassThreshold && (currentTime - lastRippleTime) > minRippleInterval) {
           lastRippleTime = currentTime;
           ripples.push({
             x: canvas.width / 2,
             y: canvas.height / 2,
             radius: 0,
-            alpha: 1
+            alpha: 1,
+            growth: 2 + (bassAvg / 20)  // Adaptive growth speed based on bass intensity.
           });
         }
 
-        // Clear the canvas with a semi-transparent black rectangle for trailing effect.
-        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+        // Clear the canvas with a transparent black fill to produce a trailing effect.
+        ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Update and draw each ripple.
         for (let i = 0; i < ripples.length; i++) {
           const ripple = ripples[i];
-          // Increase the radius and decrease the transparency.
-          ripple.radius += 3;
-          ripple.alpha -= 0.01;
+          ripple.radius += ripple.growth;
+          // Fade the ripple, with faster fade for louder beats.
+          ripple.alpha -= ripple.growth / 150;
           if (ripple.alpha <= 0) {
             ripples.splice(i, 1);
             i--;
             continue;
           }
-          // Draw the ripple with a stroke whose hue cycles based on its radius.
           ctx.beginPath();
           ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+          // Use a dynamic hue based on the ripple's growth.
           const hue = Math.floor(ripple.radius % 360);
           ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${ripple.alpha})`;
-          ctx.lineWidth = 4;
+          ctx.lineWidth = 6;
           ctx.stroke();
         }
       }
