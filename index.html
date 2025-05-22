@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tim is Mad – Ultimate CAPTCHA Upgrade</title>
+  <title>Make Tim Mad – Ultimate CAPTCHA Upgrade</title>
   <style>
     /* Global Styles */
     body {
@@ -67,8 +67,8 @@
     -----------------------------------*/
     #timContainer {
       position: relative;
-      width: 200px;
-      height: 250px;
+      width: 150px;
+      height: 150px;
       margin-bottom: 20px;
     }
     #tim {
@@ -93,7 +93,7 @@
       border-top-right-radius: 50%;
     }
     
-    /* Mushroom Head Label with Rainbow Text & Emoji */
+    /* Mushroom Head Label with Rainbow Text & Skull Emoji */
     .mushroom-label {
       position: absolute;
       top: 5px;
@@ -104,6 +104,7 @@
       background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      white-space: nowrap;
     }
     
     /* Face and Eyes */
@@ -286,7 +287,7 @@
     <div id="timContainer">
       <div id="tim" class="tim-calm">
         <div class="bowlcut"></div>
-        <!-- Mushroom Head Label with Rainbow Text and Skull Emoji -->
+        <!-- Offset Mushroom Head Label with Rainbow Text and Skull Emoji -->
         <div class="mushroom-label">Mushroom Head 💀🌈</div>
         <div class="face">
           <div class="eye left"></div>
@@ -294,9 +295,7 @@
           <div class="mouth"></div>
         </div>
         <!-- Beer Can (Noah's Juice) with Label -->
-        <div class="beer">Noah's
-          <br>Juice
-        </div>
+        <div class="beer">Noah's<br>Juice</div>
         <!-- Surfboard (Ellipse) with Label -->
         <div class="surfboard">Surfboard</div>
       </div>
@@ -313,7 +312,7 @@
   <script>
     /* -------------------------------------
        Tim's Mood and Trigger Logic
-    ----------------------------------------*/
+    -------------------------------------*/
     let angerLevel = 0;
     let negativeCount = 0;
     const timStates = ["tim-calm", "tim-slightly-annoyed", "tim-annoyed", "tim-angry", "tim-furious"];
@@ -325,45 +324,39 @@
       "SECRET RAGE MODE ACTIVATED! I've had enough!"
     ];
     
-    // A comprehensive list of positive phrases.
+    // Comprehensive list of positive phrases.
     const positiveWords = [
       "nice", "thank", "thanks", "please", "good", "awesome", "great",
       "calm", "kind", "friendly", "excellent", "wonderful", "superb", 
       "amazing", "charming", "delightful", "appreciate", "respectful", 
       "supportive", "encouraging", "optimistic", "cheerful", "fantastic", 
       "incredible", "marvelous", "splendid", "radiant", "admirable", 
-      "commendable", "uplifting", "heartening", "mellow"
+      "commendable", "uplifting", "heartening", "mellow", "love"
     ];
     
-    // A list of negative (non-swear) phrases.
+    // List of negative (non-swear) phrases.
     let negativeWords = [
       "stupid", "idiot", "hate", "annoying", "bad", "waste", "terrible",
       "useless", "dumb", "lousy", "frustrating", "disappointing", "awful",
       "the worst", "inept", "disgusting", "ridiculous", "pathetic",
       "no beer", "no surfing", "no surf", "bummer", "not cool", "ruined",
-      "miserable", "sour", "grim", "dreadful", "inferior"
-    ];
-    
-    // Add 2000 dummy negative triggers.
-    const additionalCount = 2000;
-    for (let i = 0; i < additionalCount; i++) {
-      negativeWords.push("trigger" + i);
-    }
-    
-    // Update Tim's anger level based on message content.
+      "miserable", "sour", "grim", "dreadful", "inferior","fat","hair","mushroom'
+    ];  
+
+    // Updated function to adjust Tim's mood.
     function updateAngerLevel(message) {
       const lowerMsg = message.toLowerCase();
       let foundNegative = false;
       let foundPositive = false;
       
-      // Check for any negative words.
+      // Check for negative words.
       for (const word of negativeWords) {
         if (lowerMsg.includes(word)) {
           foundNegative = true;
           break;
         }
       }
-      // Check for any positive phrases.
+      // Check for positive phrases.
       for (const word of positiveWords) {
         if (lowerMsg.includes(word)) {
           foundPositive = true;
@@ -371,14 +364,18 @@
         }
       }
       
+      // Adjust anger: if there's only negativity, increase anger.
       if (foundNegative && !foundPositive) {
         angerLevel = Math.min(angerLevel + 1, timStates.length - 1);
         negativeCount++;
-      } else if (foundPositive && !foundNegative) {
+      } 
+      // If there are positive words (with or without negativity), reduce anger.
+      else if (foundPositive) {
         angerLevel = Math.max(angerLevel - 1, 0);
+        negativeCount = Math.max(negativeCount - 1, 0);
       }
       
-      // Force secret rage mode if many negatives occur.
+      // Force secret rage mode if too many negatives accumulate.
       if (negativeCount > 5) { 
         angerLevel = timStates.length - 1;
       }
@@ -399,7 +396,7 @@
     const captchaCheckbox = document.getElementById("notARobot");
     const timSection = document.getElementById("timSection");
     
-    // When the checkbox is checked, reveal the Tim section with a slide-in animation.
+    // Show the Tim section (with slide-in animation) when the checkbox is checked.
     captchaCheckbox.addEventListener("change", function() {
       if (this.checked) {
         timSection.classList.add("show");
