@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Make Tim Mad CAPTCHA</title>
+  <title>Make Tim Mad</title>
   <style>
     /* Overall page style */
     body {
@@ -71,7 +71,7 @@
       background: black;
       border-radius: 50%;
     }
-    /* Base mouth styling – changes with Tim’s state */
+    /* Base mouth styling – its shape changes with Tim’s mood */
     .mouth {
       width: 40px;
       height: 20px;
@@ -79,39 +79,39 @@
       position: relative;
       transition: all 0.3s ease;
     }
-    /* --- Expression states --- */
-    /* Calm state: slight smile */
+    /* ----- Expression States ----- */
+    /* Calm: a gentle smile */
     .tim-calm .mouth {
       border-bottom: 3px solid black;
       border-top: none;
       border-radius: 0 0 20px 20px;
     }
-    /* Slightly annoyed: reduced curve */
+    /* Slightly annoyed: a less pronounced smile */
     .tim-slightly-annoyed .mouth {
       border-bottom: 3px solid black;
       border-top: none;
       border-radius: 0 0 10px 10px;
     }
-    /* Annoyed: flat (neutral) mouth */
+    /* Annoyed: a straight-line mouth */
     .tim-annoyed .mouth {
       border-top: 3px solid black;
       border-bottom: none;
       border-radius: 0;
     }
-    /* Angry: frowning (inverted curve) */
+    /* Angry: a frown */
     .tim-angry .mouth {
       border-top: 3px solid black;
       border-bottom: none;
       border-radius: 20px 20px 0 0;
     }
-    /* Furious: frown plus a shaking animation */
+    /* Furious: a frown with a shaking animation */
     .tim-furious .mouth {
       border-top: 3px solid black;
       border-bottom: none;
       border-radius: 20px 20px 0 0;
       animation: shake 0.5s infinite;
     }
-    /* Shake keyframes for the furious state */
+    /* Shake keyframes for furious state */
     @keyframes shake {
       0% { transform: translateX(0); }
       25% { transform: translateX(-5px); }
@@ -164,17 +164,6 @@
 
     // Anger scale: 0 = Calm, 1 = Slightly Annoyed, 2 = Annoyed, 3 = Angry, 4 = Furious
     let angerLevel = 0;
-
-    // Predefined responses based on anger level
-    const responses = [
-      "Tim: Hello, human. How can I assist you?",
-      "Tim: Hmm… I’m not sure I like your tone.",
-      "Tim: Are you doing this on purpose?!",
-      "Tim: I swear, if you say ONE more annoying thing…",
-      "Tim: THAT’S IT. CAPTCHA SOLVED. GET OUT. 😡"
-    ];
-
-    // Tim’s state classes corresponding to his anger level
     const timStates = [
       "tim-calm",
       "tim-slightly-annoyed",
@@ -183,7 +172,36 @@
       "tim-furious"
     ];
 
-    // Add a message to the chatbox (identifying if it's the user or Tim)
+    // Responses for each mood state
+    const responses = [
+      "Tim: Hello, how can I help you today?",
+      "Tim: Hmm... I sense a hint of negativity.",
+      "Tim: That's not very nice...",
+      "Tim: I'm starting to lose my patience here!",
+      "Tim: That's it! I'm absolutely furious now!"
+    ];
+
+    // Basic keyword lists (feel free to expand)
+    const negativeWords = ["stupid", "idiot", "hate", "annoying", "bad", "waste", "terrible"];
+    const positiveWords = ["nice", "thank", "please", "good", "awesome", "great", "calm", "kind", "friendly"];
+
+    // Update Tim's anger level based on message sentiment
+    function updateAngerLevel(message) {
+      const lowerMsg = message.toLowerCase();
+      const containsNegative = negativeWords.some(word => lowerMsg.includes(word));
+      const containsPositive = positiveWords.some(word => lowerMsg.includes(word));
+      // If message is negative (and not mixed with positive), increase anger.
+      if (containsNegative && !containsPositive) {
+        angerLevel = Math.min(angerLevel + 1, timStates.length - 1);
+      }
+      // If message is positive (and not mixed with negative), decrease anger.
+      else if (containsPositive && !containsNegative) {
+        angerLevel = Math.max(angerLevel - 1, 0);
+      }
+      // Mixed or neutral messages don't change the level.
+    }
+
+    // Add a message to the chatbox
     function addMessage(message, isUser = false) {
       const div = document.createElement("div");
       div.textContent = (isUser ? "You: " : "") + message;
@@ -191,22 +209,19 @@
       chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    // Handle input on Enter key
+    // Listen for user input (press Enter)
     userInput.addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
-        const userText = userInput.value.trim();
-        if (!userText) return;
-        addMessage(userText, true);
+        const text = userInput.value.trim();
+        if (!text) return;
+        addMessage(text, true);
         userInput.value = "";
-
-        // Increase Tim's anger level safely (up to a maximum)
-        if (angerLevel < timStates.length - 1) {
-          angerLevel++;
-        }
-        // Update Tim’s avatar state (which updates his facial expression/animation)
+        
+        // Update Tim's anger level based on sentiment
+        updateAngerLevel(text);
+        // Update Tim's avatar class to match his current state
         timElement.className = timStates[angerLevel];
-
-        // Add Tim's response to the chat
+        // Provide Tim's response according to his mood
         addMessage(responses[angerLevel]);
       }
     });
