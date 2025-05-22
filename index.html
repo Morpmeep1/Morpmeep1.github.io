@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>pooooTim Singing & Dancing Visualizer</title>
+  <title>EEEETim Singing & Dancing Visualizer</title>
   <style>
     /* Basic Page Styles */
     body {
@@ -24,7 +24,7 @@
     #timContainer {
       position: relative;
       width: 150px;
-      height: 350px; /* Enough height for head, body, and legs */
+      height: 350px; /* Height covers head + body + legs */
       animation: dance 1s infinite ease-in-out;
     }
     /* Dance animation applied to the whole figure */
@@ -33,16 +33,17 @@
       50%  { transform: translateY(-10px) rotate(2deg); }
       100% { transform: translateY(0px) rotate(0deg); }
     }
-    /* Tim's head */
+    /* Head – now placed absolutely at the top */
     .head {
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 150px;
       height: 150px;
       border-radius: 50%;
       background: #fbe9d3;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       overflow: hidden;
-      margin: 0 auto;
     }
     .bowlcut {
       position: absolute;
@@ -67,9 +68,9 @@
     }
     .face {
       position: absolute;
-      top: 45%;
+      bottom: 25px; /* Position near the lower third of the head */
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       width: 100%;
       text-align: center;
     }
@@ -93,7 +94,8 @@
       background: black;
       border-radius: 50%;
     }
-    /* Mouth - starts closed with a height of 6px */
+    /* Mouth – starting closed at 6px height.
+       The JS will increase its height dramatically with louder audio. */
     .mouth {
       width: 40px;
       height: 6px;
@@ -103,25 +105,27 @@
       transition: height 0.1s linear;
       transform-origin: center top;
     }
-    /* Body container (holds clothing and limbs) */
+    /* Body container positioned so that it touches the head */
     .body {
-      position: relative;
+      position: absolute;
+      top: 150px;  /* Directly below the 150px head */
+      left: 0;
       width: 150px;
       height: 200px;
-      margin-top: 10px;
+      background: transparent;
     }
     /* White singlet for torso */
     .singlet {
       position: absolute;
       top: 10px;
-      left: 25px;
-      width: 100px;
+      left: 15px;
+      width: 120px;
       height: 80px;
       background: #fff;
       border: 2px solid #ccc;
       border-radius: 5px;
     }
-    /* Arms */
+    /* Arms – attached to the singlet */
     .arm {
       position: absolute;
       width: 20px;
@@ -131,16 +135,16 @@
       border-radius: 10px;
     }
     .leftArm {
-      top: 10px;
-      left: 0;
+      top: 20px;
+      left: -10px;  /* Extends slightly outside the torso */
       transform: rotate(10deg);
     }
     .rightArm {
-      top: 10px;
-      right: 0;
+      top: 20px;
+      right: -10px;
       transform: rotate(-10deg);
     }
-    /* Legs */
+    /* Legs – anchored to the bottom of the body container */
     .leg {
       position: absolute;
       width: 20px;
@@ -151,11 +155,11 @@
     }
     .leftLeg {
       bottom: 0;
-      left: 40px;
+      left: 25px;
     }
     .rightLeg {
       bottom: 0;
-      right: 40px;
+      right: 25px;
     }
     /* Credit Styling */
     #credit {
@@ -173,25 +177,23 @@
   <input type="file" id="fileInput" accept="audio/mp3">
   
   <div id="timContainer">
-    <div id="tim">
-      <!-- Head Section -->
-      <div class="head">
-        <div class="bowlcut"></div>
-        <div class="mushroom-label">Mushroom Head 💀🌈</div>
-        <div class="face">
-          <div class="eye left"></div>
-          <div class="eye right"></div>
-          <div class="mouth" id="mouth"></div>
-        </div>
+    <!-- Head -->
+    <div class="head">
+      <div class="bowlcut"></div>
+      <div class="mushroom-label">Mushroom Head 💀🌈</div>
+      <div class="face">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="mouth" id="mouth"></div>
       </div>
-      <!-- Body Section -->
-      <div class="body">
-        <div class="singlet"></div>
-        <div class="arm leftArm"></div>
-        <div class="arm rightArm"></div>
-        <div class="leg leftLeg"></div>
-        <div class="leg rightLeg"></div>
-      </div>
+    </div>
+    <!-- Body -->
+    <div class="body">
+      <div class="singlet"></div>
+      <div class="arm leftArm"></div>
+      <div class="arm rightArm"></div>
+      <div class="leg leftLeg"></div>
+      <div class="leg rightLeg"></div>
     </div>
   </div>
   
@@ -216,7 +218,7 @@
         audio.loop = true;
         audio.play();
         
-        // Set up Web Audio API.
+        // Set up the Web Audio API.
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
@@ -241,19 +243,11 @@
         }
         const average = sum / dataArray.length;
         
-        // Map the average amplitude to a scale factor.
-        // When quiet, Tim’s mouth remains nearly closed (height = 6px)
-        // Otherwise, increase the factor so the mouth opens bigger.
-        let scaleFactor;
-        if (average < 20) {
-          scaleFactor = 0.3;
-        } else {
-          // Increase sensitivity: use average/150 instead of average/300,
-          // then add a base value (0.3) so it starts from a closed state.
-          scaleFactor = 0.3 + (average / 150);
-        }
-        // Cap the scale factor to a higher value for a more dramatic open.
-        scaleFactor = Math.min(scaleFactor, 3.0);
+        // Compute a scale factor that makes the mouth open dramatically.
+        // When quiet, scale = 1 (mouth height = 6px). For louder audio, add average/30.
+        // Cap at a maximum factor of 10.
+        let scaleFactor = 1 + (average / 30);
+        scaleFactor = Math.min(scaleFactor, 10.0);
         
         // Compute new mouth height.
         const newHeight = 6 * scaleFactor;
