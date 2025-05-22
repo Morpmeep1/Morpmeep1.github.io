@@ -16,7 +16,9 @@
       align-items: center;
     }
     
-    /* reCAPTCHA Style Checkbox */
+    /* -------------------------
+       reCAPTCHA Style Checkbox 
+    -------------------------- */
     #captchaBox {
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -43,7 +45,9 @@
       margin-right: 8px;
     }
     
-    /* Hidden Tim Section — slides into view */
+    /* -------------------------------------------
+       Hidden Tim Section – slides into view
+    ------------------------------------------- */
     #timSection {
       width: 100%;
       max-width: 600px;
@@ -58,11 +62,13 @@
       opacity: 1;
     }
     
-    /* Tim's Avatar Container & Details */
+    /* ---------------------------------
+       Tim's Avatar Container & Details
+    -----------------------------------*/
     #timContainer {
       position: relative;
-      width: 150px;
-      height: 150px;
+      width: 200px;
+      height: 250px;
       margin-bottom: 20px;
     }
     #tim {
@@ -87,17 +93,17 @@
       border-top-right-radius: 50%;
     }
     
-    /* Mushroom Head Label with Rainbow Text & Skull Emoji */
+    /* Mushroom Head Label with Rainbow Text & Emoji */
     .mushroom-label {
       position: absolute;
       top: 5px;
-      right: -100px;  /* offset to avoid clipping */
+      right: -100px;
       font-size: 14px;
       font-weight: bold;
+      /* Rainbow gradient text */
       background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      white-space: nowrap;
     }
     
     /* Face and Eyes */
@@ -138,7 +144,9 @@
       transition: all 0.3s ease;
     }
     
-    /* Detailed Accessories */
+    /* ------------------------------
+         Detailed Accessories
+    -------------------------------*/
     /* Beer Can (Noah's Juice) */
     .beer {
       position: absolute;
@@ -168,7 +176,7 @@
       height: 40px;
       background: linear-gradient(135deg, #00ccff, #0099cc);
       border-radius: 50%;
-      left: -20px;  /* adjusted from -50px to -20px */
+      left: -20px;
       bottom: -20px;
       transform: rotate(-20deg);
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -180,7 +188,9 @@
       font-weight: bold;
     }
     
-    /* Tim's Mood (Facial Expressions) */
+    /* ---------------------------------
+       Tim's Mood (Facial Expressions)
+    ----------------------------------- */
     .tim-calm .mouth {
       border-bottom: 3px solid black;
       border-radius: 0 0 20px 20px;
@@ -206,14 +216,16 @@
       animation: shake 0.5s infinite;
     }
     @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
+      0%   { transform: translateX(0); }
+      25%  { transform: translateX(-5px); }
+      50%  { transform: translateX(5px); }
+      75%  { transform: translateX(-5px); }
       100% { transform: translateX(0); }
     }
     
-    /* Chatbox Styling */
+    /* -----------------
+       Chatbox Styling
+    ------------------ */
     #chatbox {
       width: 400px;
       height: 300px;
@@ -231,4 +243,184 @@
     }
     #userInput {
       width: 390px;
-      padding
+      padding: 5px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    /* ------------------
+       Rainbow Credit
+    -------------------- */
+    #credit {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      animation: rainbow 3s infinite linear;
+    }
+    @keyframes rainbow {
+      0% { color: red; }
+      15% { color: orange; }
+      30% { color: yellow; }
+      45% { color: green; }
+      60% { color: blue; }
+      75% { color: indigo; }
+      100% { color: violet; }
+    }
+  </style>
+</head>
+<body>
+  <!-- reCAPTCHA–Style Box -->
+  <div id="captchaBox">
+    <input type="checkbox" id="notARobot">
+    <label for="notARobot">
+      <img id="captchaLogo" src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA logo">
+      I'm not a robot
+    </label>
+  </div>
+  
+  <!-- Hidden Tim Section (slides into view when reCAPTCHA is solved) -->
+  <div id="timSection">
+    <div id="timContainer">
+      <div id="tim" class="tim-calm">
+        <div class="bowlcut"></div>
+        <!-- Mushroom Head Label with Rainbow Text and Skull Emoji -->
+        <div class="mushroom-label">Mushroom Head 💀🌈</div>
+        <div class="face">
+          <div class="eye left"></div>
+          <div class="eye right"></div>
+          <div class="mouth"></div>
+        </div>
+        <!-- Beer Can (Noah's Juice) with Label -->
+        <div class="beer">Noah's
+          <br>Juice
+        </div>
+        <!-- Surfboard (Ellipse) with Label -->
+        <div class="surfboard">Surfboard</div>
+      </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Say something to Tim..." />
+  </div>
+  
+  <!-- Rainbow Credit -->
+  <div id="credit">Made by Noah</div>
+  
+  <script>
+    /* -------------------------------------
+       Tim's Mood and Trigger Logic
+    ----------------------------------------*/
+    let angerLevel = 0;
+    let negativeCount = 0;
+    const timStates = ["tim-calm", "tim-slightly-annoyed", "tim-annoyed", "tim-angry", "tim-furious"];
+    const responses = [
+      "Hello, how can I help you today?",
+      "Hmm... that doesn't sound too friendly.",
+      "I'm starting to get irritated. Bring me some beer!",
+      "You better fix this, or I won't stand for it!",
+      "SECRET RAGE MODE ACTIVATED! I've had enough!"
+    ];
+    
+    // A comprehensive list of positive phrases.
+    const positiveWords = [
+      "nice", "thank", "thanks", "please", "good", "awesome", "great",
+      "calm", "kind", "friendly", "excellent", "wonderful", "superb", 
+      "amazing", "charming", "delightful", "appreciate", "respectful", 
+      "supportive", "encouraging", "optimistic", "cheerful", "fantastic", 
+      "incredible", "marvelous", "splendid", "radiant", "admirable", 
+      "commendable", "uplifting", "heartening", "mellow"
+    ];
+    
+    // A list of negative (non-swear) phrases.
+    let negativeWords = [
+      "stupid", "idiot", "hate", "annoying", "bad", "waste", "terrible",
+      "useless", "dumb", "lousy", "frustrating", "disappointing", "awful",
+      "the worst", "inept", "disgusting", "ridiculous", "pathetic",
+      "no beer", "no surfing", "no surf", "bummer", "not cool", "ruined",
+      "miserable", "sour", "grim", "dreadful", "inferior","fat"
+    ];
+    
+    // Add 2000 dummy negative triggers.
+    const additionalCount = 2000;
+    for (let i = 0; i < additionalCount; i++) {
+      negativeWords.push("trigger" + i);
+    }
+    
+    // Update Tim's anger level based on message content.
+    function updateAngerLevel(message) {
+      const lowerMsg = message.toLowerCase();
+      let foundNegative = false;
+      let foundPositive = false;
+      
+      // Check for any negative words.
+      for (const word of negativeWords) {
+        if (lowerMsg.includes(word)) {
+          foundNegative = true;
+          break;
+        }
+      }
+      // Check for any positive phrases.
+      for (const word of positiveWords) {
+        if (lowerMsg.includes(word)) {
+          foundPositive = true;
+          break;
+        }
+      }
+      
+      if (foundNegative && !foundPositive) {
+        angerLevel = Math.min(angerLevel + 1, timStates.length - 1);
+        negativeCount++;
+      } else if (foundPositive && !foundNegative) {
+        angerLevel = Math.max(angerLevel - 1, 0);
+      }
+      
+      // Force secret rage mode if many negatives occur.
+      if (negativeCount > 5) { 
+        angerLevel = timStates.length - 1;
+      }
+    }
+    
+    // Append a message to the chatbox.
+    function addMessage(message, isUser = false) {
+      const chatbox = document.getElementById("chatbox");
+      const div = document.createElement("div");
+      div.textContent = (isUser ? "You: " : "Tim: ") + message;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+    
+    // DOM Elements.
+    const userInput = document.getElementById("userInput");
+    const timElement = document.getElementById("tim");
+    const captchaCheckbox = document.getElementById("notARobot");
+    const timSection = document.getElementById("timSection");
+    
+    // When the checkbox is checked, reveal the Tim section with a slide-in animation.
+    captchaCheckbox.addEventListener("change", function() {
+      if (this.checked) {
+        timSection.classList.add("show");
+      } else {
+        timSection.classList.remove("show");
+      }
+    });
+    
+    // Listen for the Enter key in the chat input.
+    userInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        const text = userInput.value.trim();
+        if (!text) return;
+        addMessage(text, true);
+        userInput.value = "";
+        
+        updateAngerLevel(text);
+        timElement.className = timStates[angerLevel];
+        addMessage(responses[angerLevel]);
+      }
+    });
+  </script>
+</body>
+</html>
