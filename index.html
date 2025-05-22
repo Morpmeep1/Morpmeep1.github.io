@@ -18,7 +18,7 @@
             border-radius: 50%;
             opacity: 1;
             pointer-events: none;
-            animation: explode 0.5s ease-out forwards;
+            animation: explode 0.6s ease-out forwards;
         }
 
         @keyframes explode {
@@ -32,7 +32,7 @@
 <script>
 document.addEventListener("click", (event) => {
     const numParticles = 20;
-    const colors = ["#ff4f4f", "#4fff4f", "#4f4fff", "#ffff4f", "#ff4fff"];
+    const colors = ["#FF6138", "#FFBE53", "#2980B9", "#282741"];
     const color = colors[Math.floor(Math.random() * colors.length)];
 
     for (let i = 0; i < numParticles; i++) {
@@ -41,14 +41,16 @@ document.addEventListener("click", (event) => {
         particle.style.background = color;
         document.body.appendChild(particle);
 
-        const x = (Math.random() - 0.5) * 200 + "px";
-        const y = (Math.random() - 0.5) * 200 + "px";
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * 50 + 30;
+        const x = Math.cos(angle) * distance + "px";
+        const y = Math.sin(angle) * distance + "px";
         particle.style.setProperty("--x", x);
         particle.style.setProperty("--y", y);
         particle.style.left = event.clientX + "px";
         particle.style.top = event.clientY + "px";
 
-        setTimeout(() => particle.remove(), 500);
+        setTimeout(() => particle.remove(), 600);
     }
 });
 </script>
