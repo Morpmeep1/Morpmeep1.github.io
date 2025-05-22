@@ -87,7 +87,7 @@
         luaScript += "bpm = 180\n\n";
         luaScript += 'loadstring(game:HttpGet("https://raw.githubusercontent.com/hellohellohell012321/TALENTLESS/main/loader_main.lua", true))()\n\n';
         
-        // Flatten all notes from all tracks into one array
+        // Flatten all notes from every track into one list
         let allNotes = [];
         midi.tracks.forEach(track => {
           track.notes.forEach(note => {
@@ -95,7 +95,7 @@
           });
         });
         
-        // Sort notes by start time
+        // Sort notes by their start time
         allNotes.sort((a, b) => a.time - b.time);
         
         // Group notes that occur nearly simultaneously (within 50ms)
@@ -113,7 +113,7 @@
           groups.push(currentGroup);
         }
         
-        // Custom key mapping to match the sample output.
+        // Custom key mapping to produce the desired output.
         const keyMap = {
           60: "5",
           61: "w",
@@ -127,14 +127,13 @@
           69: "w"
         };
         
-        // Process each group: add keypress for each note then a rest line (if not the last group)
+        // Process each group: output keypress lines, then a fixed rest(4, bpm) between groups.
         groups.forEach((group, index) => {
           group.forEach(note => {
-            // Use mapping if available, or default to the MIDI note number as a string.
             let key = keyMap[note.midi] || note.midi.toString();
+            // Note: "x" and "bpm" are literal text in the output.
             luaScript += `keypress("${key}", x, bpm)\n`;
           });
-          // Insert a fixed rest of 4 unless this is the last group.
           if (index < groups.length - 1) {
             luaScript += `rest(4, bpm)\n`;
           }
@@ -142,7 +141,7 @@
         
         luaScript += "finishedSong()";
         
-        // Display the Lua script with fade-in animation
+        // Display the Lua script in the output area with a fade-in animation.
         const outputElement = document.getElementById("output");
         outputElement.textContent = luaScript;
         outputElement.classList.add("visible");
