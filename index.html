@@ -3,28 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adaptive Music Visualizer Ripple</title>
+  <title>Tim Singing Visualizer</title>
   <style>
     /* Basic Page Styles */
     body {
       margin: 0;
       padding: 0;
-      background: #000;
+      background: #222;
       display: flex;
       flex-direction: column;
       align-items: center;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
     }
     #fileInput {
       margin: 20px;
     }
-    /* Fullscreen Canvas */
-    canvas {
-      border: 1px solid #222;
-      display: block;
+    
+    /* Tim Avatar Container */
+    #timContainer {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 20px auto;
     }
-    /* Credit Styling */
+    #tim {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #fbe9d3;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    /* Bowl Cut */
+    .bowlcut {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: #a67c52;
+      border-top-left-radius: 50%;
+      border-top-right-radius: 50%;
+    }
+    /* Mushroom Head Label */
+    .mushroom-label {
+      position: absolute;
+      top: 5px;
+      right: -100px;
+      font-size: 14px;
+      font-weight: bold;
+      background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    /* Face */
+    .face {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+    }
+    /* Eyes */
+    .eye {
+      width: 15px;
+      height: 15px;
+      background: #fff;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 0 10px;
+      position: relative;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+    }
+    .eye::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 7px;
+      height: 7px;
+      background: black;
+      border-radius: 50%;
+    }
+    /* Mouth (Tim's Singing Feature) */
+    .mouth {
+      width: 40px;
+      height: 20px;
+      margin: 10px auto 0;
+      background: #900; /* A dark red for the open mouth */
+      border-radius: 0 0 20px 20px;
+      transition: transform 0.1s linear;
+      transform-origin: center top; /* scales its height from the top */
+    }
+    
+    /* Credit styling */
     #credit {
       position: fixed;
       bottom: 10px;
@@ -32,111 +107,75 @@
       font-size: 16px;
       font-weight: bold;
       color: #fff;
-      z-index: 100;
     }
   </style>
 </head>
 <body>
   <input type="file" id="fileInput" accept="audio/mp3">
-  <canvas id="canvas"></canvas>
+  <div id="timContainer">
+    <div id="tim">
+      <div class="bowlcut"></div>
+      <div class="mushroom-label">Mushroom Head 💀</div>
+      <div class="face">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="mouth" id="mouth"></div>
+      </div>
+    </div>
+  </div>
   <div id="credit">Made by Noah</div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const fileInput = document.getElementById("fileInput");
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-
-      // Set canvas size to match the window.
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const mouth = document.getElementById("mouth");
 
       let audio, audioContext, analyser, source;
       let dataArray, bufferLength;
-      let ripples = [];
-      let lastRippleTime = 0;
-      // Lower the interval between ripples for more precise visual response.
-      const minRippleInterval = 100;
-
-      // Helper to compute an average over a slice of an array.
-      function getAverage(arr, start, end) {
-        let sum = 0;
-        for (let i = start; i < end; i++) {
-          sum += arr[i];
-        }
-        return sum / (end - start);
-      }
 
       fileInput.addEventListener("change", function() {
         const file = this.files[0];
-        if (!file) return;
+        if(!file) return;
         const url = URL.createObjectURL(file);
-
-        // Create and configure the audio element.
+        
+        // Create an audio element and play the file.
         audio = new Audio(url);
         audio.crossOrigin = "anonymous";
         audio.loop = true;
         audio.play();
-
+        
         // Set up the Web Audio API.
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256; // yields 128 frequency bins.
+        analyser.fftSize = 256;
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
 
         source = audioContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(audioContext.destination);
-
+        
         animate();
       });
 
       function animate() {
         requestAnimationFrame(animate);
         analyser.getByteFrequencyData(dataArray);
-
-        // Compute the bass average using first 10 indices.
-        const bassCount = 10;
-        const bassAvg = getAverage(dataArray, 0, bassCount);
-        const currentTime = performance.now();
-        const bassThreshold = 60; // Lower threshold for bass-based beat detection
-
-        // If bass levels exceed the threshold and enough time has passed, create a new ripple.
-        if (bassAvg > bassThreshold && (currentTime - lastRippleTime) > minRippleInterval) {
-          lastRippleTime = currentTime;
-          ripples.push({
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 0,
-            alpha: 1,
-            growth: 2 + (bassAvg / 20)  // Adaptive growth speed based on bass intensity.
-          });
+        
+        // Calculate the average amplitude.
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
         }
+        const average = sum / dataArray.length;
+        
+        // Compute a scale factor for the mouth.
+        // When there's no sound, scale = 1 (default), and then it increases.
+        let scale = 1 + (average / 300);  // tweak divisor to control sensitivity
+        scale = Math.min(scale, 2.0); // cap the scaling to 2 for realism
 
-        // Clear the canvas with a transparent black fill to produce a trailing effect.
-        ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Update and draw each ripple.
-        for (let i = 0; i < ripples.length; i++) {
-          const ripple = ripples[i];
-          ripple.radius += ripple.growth;
-          // Fade the ripple, with faster fade for louder beats.
-          ripple.alpha -= ripple.growth / 150;
-          if (ripple.alpha <= 0) {
-            ripples.splice(i, 1);
-            i--;
-            continue;
-          }
-          ctx.beginPath();
-          ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
-          // Use a dynamic hue based on the ripple's growth.
-          const hue = Math.floor(ripple.radius % 360);
-          ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${ripple.alpha})`;
-          ctx.lineWidth = 6;
-          ctx.stroke();
-        }
+        // Update the mouth element's vertical scaling to simulate singing.
+        mouth.style.transform = `scaleY(${scale})`;
       }
     });
   </script>
