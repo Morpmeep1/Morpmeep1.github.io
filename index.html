@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tim Singing Visualizer</title>
+  <title>Tim Singing & Dancing Visualizer</title>
   <style>
     /* Basic Page Styles */
     body {
@@ -15,18 +15,23 @@
       align-items: center;
       color: #fff;
       font-family: sans-serif;
+      overflow-x: hidden;
     }
+    
     #fileInput {
       margin: 20px;
     }
     
-    /* Tim Avatar Container */
+    /* Container for Tim’s head and body */
     #timContainer {
       position: relative;
       width: 150px;
-      height: 150px;
+      /* Increase container height to accommodate head and full body */
+      height: 300px;
       margin: 20px auto;
     }
+    
+    /* Tim’s Head Styles */
     #tim {
       position: relative;
       width: 150px;
@@ -34,7 +39,9 @@
       border-radius: 50%;
       background: #fbe9d3;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      overflow: hidden;
     }
+    
     /* Bowl Cut */
     .bowlcut {
       position: absolute;
@@ -46,7 +53,8 @@
       border-top-left-radius: 50%;
       border-top-right-radius: 50%;
     }
-    /* Mushroom Head Label */
+    
+    /* Rainbow Mushroom Label */
     .mushroom-label {
       position: absolute;
       top: 5px;
@@ -58,7 +66,8 @@
       -webkit-text-fill-color: transparent;
       white-space: nowrap;
     }
-    /* Face */
+    
+    /* Face (Eyes and Mouth container) */
     .face {
       position: absolute;
       top: 45%;
@@ -67,6 +76,7 @@
       width: 100%;
       text-align: center;
     }
+    
     /* Eyes */
     .eye {
       width: 15px;
@@ -88,18 +98,39 @@
       background: black;
       border-radius: 50%;
     }
-    /* Mouth (Tim's Singing Feature) */
+    
+    /* Mouth - starts "closed" (small height) */
     .mouth {
       width: 40px;
-      height: 20px;
+      height: 6px;  /* closed mouth height */
       margin: 10px auto 0;
-      background: #900; /* A dark red for the open mouth */
+      background: #900;
       border-radius: 0 0 20px 20px;
-      transition: transform 0.1s linear;
-      transform-origin: center top; /* scales its height from the top */
+      transition: transform 0.1s linear, height 0.1s linear;
+      transform-origin: center top;
     }
     
-    /* Credit styling */
+    /* Tim's Full Body - a simple rectangle with dancing animation */
+    #timBody {
+      position: absolute;
+      top: 160px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 120px;
+      background: #fbe9d3;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      animation: dance 1s infinite ease-in-out;
+    }
+    
+    @keyframes dance {
+      0%   { transform: translateX(-50%) translateY(0px) rotate(0deg); }
+      50%  { transform: translateX(-50%) translateY(-10px) rotate(5deg); }
+      100% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
+    }
+    
+    /* Credit Styling */
     #credit {
       position: fixed;
       bottom: 10px;
@@ -107,24 +138,30 @@
       font-size: 16px;
       font-weight: bold;
       color: #fff;
+      z-index: 100;
     }
   </style>
 </head>
 <body>
   <input type="file" id="fileInput" accept="audio/mp3">
+  
   <div id="timContainer">
+    <!-- Tim's Head -->
     <div id="tim">
       <div class="bowlcut"></div>
-      <div class="mushroom-label">Mushroom Head 💀</div>
+      <div class="mushroom-label">Mushroom Head 💀🌈</div>
       <div class="face">
         <div class="eye left"></div>
         <div class="eye right"></div>
         <div class="mouth" id="mouth"></div>
       </div>
     </div>
+    <!-- Tim's Dancing Body -->
+    <div id="timBody"></div>
   </div>
+  
   <div id="credit">Made by Noah</div>
-
+  
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const fileInput = document.getElementById("fileInput");
@@ -169,13 +206,23 @@
         }
         const average = sum / dataArray.length;
         
-        // Compute a scale factor for the mouth.
-        // When there's no sound, scale = 1 (default), and then it increases.
-        let scale = 1 + (average / 300);  // tweak divisor to control sensitivity
-        scale = Math.min(scale, 2.0); // cap the scaling to 2 for realism
+        // Compute a scale for the mouth. When it's very quiet, the mouth stays closed.
+        let scaleFactor;
+        if (average < 20) {
+          // Very low volume, mouth is closed.
+          scaleFactor = 0.3;
+        } else {
+          // As average increases, the mouth opens. Start from a small closed state (0.3) and add.
+          scaleFactor = 0.3 + (average / 300);
+        }
+        scaleFactor = Math.min(scaleFactor, 2.0);  // cap the scaling
 
-        // Update the mouth element's vertical scaling to simulate singing.
-        mouth.style.transform = `scaleY(${scale})`;
+        // Adjust the mouth height accordingly.
+        // Default closed height is 6px, so we multiply that.
+        const newHeight = 6 * scaleFactor;
+        mouth.style.height = newHeight + "px";
+        // Optionally, you can also use scaleY transform:
+        // mouth.style.transform = `scaleY(${scaleFactor})`;
       }
     });
   </script>
