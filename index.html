@@ -1,64 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Please Dynamic Particle Explosion</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #222;
-        }
-
-        .particle {
-            position: absolute;
-            width: var(--size);
-            height: var(--size);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 1;
-            animation: explode var(--duration) ease-out forwards;
-        }
-
-        @keyframes explode {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Make Tim Mad CAPTCHA</title>
+  <style>
+    /* Overall page style */
+    body {
+      background: #f2f2f2;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    /* Container for Tim’s avatar */
+    #timContainer {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 20px;
+    }
+    /* Tim’s base style – a circle with a soft skin tone */
+    #tim {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 50%;
+      background: #fbe9d3;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    /* Hair on Tim – a simple curved shape */
+    .hair {
+      position: absolute;
+      top: -10px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #a67c52;
+      border-top-left-radius: 80px;
+      border-top-right-radius: 80px;
+    }
+    /* Face container for positioning features */
+    .face {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    /* Eyes styling */
+    .eye {
+      width: 15px;
+      height: 15px;
+      background: white;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 0 10px;
+      position: relative;
+    }
+    .eye::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 7px;
+      height: 7px;
+      background: black;
+      border-radius: 50%;
+    }
+    /* Base mouth styling – changes with Tim’s state */
+    .mouth {
+      width: 40px;
+      height: 20px;
+      margin: 10px auto 0;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    /* --- Expression states --- */
+    /* Calm state: slight smile */
+    .tim-calm .mouth {
+      border-bottom: 3px solid black;
+      border-top: none;
+      border-radius: 0 0 20px 20px;
+    }
+    /* Slightly annoyed: reduced curve */
+    .tim-slightly-annoyed .mouth {
+      border-bottom: 3px solid black;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+    /* Annoyed: flat (neutral) mouth */
+    .tim-annoyed .mouth {
+      border-top: 3px solid black;
+      border-bottom: none;
+      border-radius: 0;
+    }
+    /* Angry: frowning (inverted curve) */
+    .tim-angry .mouth {
+      border-top: 3px solid black;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+    }
+    /* Furious: frown plus a shaking animation */
+    .tim-furious .mouth {
+      border-top: 3px solid black;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      animation: shake 0.5s infinite;
+    }
+    /* Shake keyframes for the furious state */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    /* Chatbox styling */
+    #chatbox {
+      width: 400px;
+      height: 300px;
+      border: 2px solid #444;
+      padding: 10px;
+      overflow-y: auto;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    #chatbox div {
+      margin: 4px 0;
+    }
+    #userInput {
+      width: 390px;
+      padding: 5px;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
+  <h2>Make Tim Mad</h2>
+  <!-- Tim’s animated avatar -->
+  <div id="timContainer">
+    <div id="tim" class="tim-calm">
+      <div class="hair"></div>
+      <div class="face">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="mouth"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Chat interface -->
+  <div id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="Say something to Tim..." />
 
-<script>
-document.addEventListener("click", (event) => {
-    const numParticles = 60; // More particles for bigger explosion
-    const colors = ["#FF6138", "#FFBE53", "#2980B9", "#282741", "#00FF7F", "#8A2BE2"];
-    const explosionSpeed = 200; // Adjust explosion distance
-    const color = colors[Math.floor(Math.random() * colors.length)];
+  <script>
+    // Get references to elements
+    const chatbox = document.getElementById("chatbox");
+    const userInput = document.getElementById("userInput");
+    const timElement = document.getElementById("tim");
 
-    for (let i = 0; i < numParticles; i++) {
-        const particle = document.createElement("div");
-        particle.classList.add("particle");
-        particle.style.background = color;
-        document.body.appendChild(particle);
+    // Anger scale: 0 = Calm, 1 = Slightly Annoyed, 2 = Annoyed, 3 = Angry, 4 = Furious
+    let angerLevel = 0;
 
-        const angle = Math.random() * 2 * Math.PI;
-        const distance = Math.random() * explosionSpeed;
-        const x = Math.cos(angle) * distance + "px";
-        const y = Math.sin(angle) * distance + "px";
+    // Predefined responses based on anger level
+    const responses = [
+      "Tim: Hello, human. How can I assist you?",
+      "Tim: Hmm… I’m not sure I like your tone.",
+      "Tim: Are you doing this on purpose?!",
+      "Tim: I swear, if you say ONE more annoying thing…",
+      "Tim: THAT’S IT. CAPTCHA SOLVED. GET OUT. 😡"
+    ];
 
-        particle.style.setProperty("--x", x);
-        particle.style.setProperty("--y", y);
-        particle.style.setProperty("--size", Math.random() * 15 + 10 + "px");
-        particle.style.setProperty("--duration", Math.random() * 0.8 + 0.6 + "s");
+    // Tim’s state classes corresponding to his anger level
+    const timStates = [
+      "tim-calm",
+      "tim-slightly-annoyed",
+      "tim-annoyed",
+      "tim-angry",
+      "tim-furious"
+    ];
 
-        particle.style.left = event.clientX + "px";
-        particle.style.top = event.clientY + "px";
-
-        setTimeout(() => particle.remove(), 1200);
+    // Add a message to the chatbox (identifying if it's the user or Tim)
+    function addMessage(message, isUser = false) {
+      const div = document.createElement("div");
+      div.textContent = (isUser ? "You: " : "") + message;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
     }
-});
-</script>
 
+    // Handle input on Enter key
+    userInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        const userText = userInput.value.trim();
+        if (!userText) return;
+        addMessage(userText, true);
+        userInput.value = "";
+
+        // Increase Tim's anger level safely (up to a maximum)
+        if (angerLevel < timStates.length - 1) {
+          angerLevel++;
+        }
+        // Update Tim’s avatar state (which updates his facial expression/animation)
+        timElement.className = timStates[angerLevel];
+
+        // Add Tim's response to the chat
+        addMessage(responses[angerLevel]);
+      }
+    });
+  </script>
 </body>
 </html>
