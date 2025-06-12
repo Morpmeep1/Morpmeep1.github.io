@@ -2,363 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> Singing & Dancing Visualizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scary Timmeh</title>
   <style>
-    /* Basic Page Styles */
     body {
       margin: 0;
-      padding: 0;
-      background: #222;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+    header {
+      background: #000;
+      padding: 10px 20px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      color: #fff;
-      font-family: sans-serif;
-      overflow-x: hidden;
+      justify-content: space-between;
     }
-    .controls {
-      margin: 20px;
-      text-align: center;
-    }
-    input, button {
-      padding: 8px;
-      margin: 4px;
-      font-size: 14px;
-    }
-    /* Container for the entire Tim character */
-    #timContainer {
-      position: relative;
-      width: 150px;
-      height: 350px; /* Overall height covers head + body + legs */
-      /* This CSS animation ensures that the full figure moves as one unit. */
-      animation: dance 1s infinite ease-in-out;
-    }
-    /* Dance animation applied to the whole figure */
-    @keyframes dance {
-      0%   { transform: translateY(0px) rotate(0deg); }
-      50%  { transform: translateY(-10px) rotate(2deg); }
-      100% { transform: translateY(0px) rotate(0deg); }
-    }
-    /* Head – positioned at the top of the container */
-    .head {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: #fbe9d3;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      overflow: hidden;
-    }
-    .bowlcut {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 40px;
-      background: #a67c52;
-      border-top-left-radius: 50%;
-      border-top-right-radius: 50%;
-    }
-    .mushroom-label {
-      position: absolute;
-      top: 5px;
-      right: -100px;
-      font-size: 14px;
-      font-weight: bold;
-      background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      white-space: nowrap;
-    }
-    /* Face positioned so that eyes and mouth are in an appropriate spot */
-    .face {
-      position: absolute;
-      top: 65px; /* Adjusted upward for better placement on the head */
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      text-align: center;
-    }
-    .eye {
-      width: 15px;
-      height: 15px;
-      background: #fff;
-      border-radius: 50%;
-      display: inline-block;
-      margin: 0 10px;
-      position: relative;
-      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
-    }
-    .eye::after {
-      content: "";
-      position: absolute;
-      top: 3px;
-      left: 4px;
-      width: 7px;
-      height: 7px;
-      background: black;
-      border-radius: 50%;
-    }
-    /* Mouth – starts closed at 6px; JS will dramatically increase its height */
-    .mouth {
+    header img {
       width: 40px;
-      height: 6px;
-      margin: 10px auto 0;
-      background: #900;
-      border-radius: 0 0 20px 20px;
-      transition: height 0.1s linear;
-      transform-origin: center top;
+      border-radius: 50%;
     }
-    /* Body container positioned so it touches the head */
-    .body {
-      position: absolute;
-      top: 140px;  /* Adjusted so the torso attaches directly to the head */
-      left: 0;
-      width: 150px;
-      height: 210px;
-      background: transparent;
-    }
-    /* White singlet for torso */
-    .singlet {
-      position: absolute;
-      top: 10px;
-      left: 15px;
-      width: 120px;
-      height: 80px;
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 5px;
-    }
-    /* Arms – attached to the singlet */
-    .arm {
-      position: absolute;
-      width: 20px;
-      height: 60px;
-      background: #fbe9d3;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-    }
-    .leftArm {
-      top: 20px;
-      left: -10px;  /* Extends slightly outside the torso */
-      transform: rotate(10deg);
-    }
-    .rightArm {
-      top: 20px;
-      right: -10px;
-      transform: rotate(-10deg);
-    }
-    /* Legs – anchored to the bottom of the body container */
-    .leg {
-      position: absolute;
-      width: 20px;
-      height: 60px;
-      background: #fbe9d3;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-    }
-    .leftLeg {
-      bottom: 0;
-      left: 25px;
-    }
-    .rightLeg {
-      bottom: 0;
-      right: 25px;
-    }
-    /* YouTube player container (for YouTube mode) */
-    #youtubeContainer {
-      width: 300px;
-      height: 170px;
-      margin: 20px auto;
-      display: none;
-    }
-    /* Credit Styling */
-    #credit {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      font-size: 16px;
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
       font-weight: bold;
-      color: #fff;
-      z-index: 100;
+      cursor: pointer;
+    }
+    .banner {
+      background: url('https://www.transparenttextures.com/patterns/dark-mosaic.png');
+      padding: 60px 20px 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      border-bottom: 5px solid #f55;
+    }
+    .section {
+      display: none;
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: auto;
+      background: #222;
+    }
+    .section.active {
+      display: block;
+    }
+    .download-box img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 10px;
+    }
+    .download-box {
+      margin-top: 20px;
+      text-align: center;
     }
   </style>
-  <!-- Load YouTube IFrame API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-  <div class="controls">
-    <!-- File input for local MP3 -->
-    <input type="file" id="fileInput" accept="audio/mp3">
-    <br>
-    <!-- Input for YouTube link and load button -->
-    <input type="text" id="youtubeInput" placeholder="Enter YouTube link">
-    <button id="loadYouTubeButton">Load YouTube</button>
-  </div>
-  
-  <!-- Tim visualizer container -->
-  <div id="timContainer">
-    <!-- Head -->
-    <div class="head">
-      <div class="bowlcut"></div>
-      <div class="mushroom-label">Mushroom Head 💀🌈</div>
-      <div class="face">
-        <div class="eye left"></div>
-        <div class="eye right"></div>
-        <div class="mouth" id="mouth"></div>
-      </div>
+  <header>
+    <div style="display: flex; align-items: center;">
+      <img src="https://i.imgur.com/thN5x7t.png" alt="Timmeh Icon" />
+      <span style="margin-left: 10px; font-size: 20px;">Scary Timmeh</span>
     </div>
-    <!-- Body -->
-    <div class="body">
-      <div class="singlet"></div>
-      <div class="arm leftArm"></div>
-      <div class="arm rightArm"></div>
-      <div class="leg leftLeg"></div>
-      <div class="leg rightLeg"></div>
+    <nav>
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('download')">Download</a>
+      <a onclick="showPage('info')">Information</a>
+      <a onclick="showPage('game1')">Scary Timmeh 1</a>
+    </nav>
+  </header>
+
+  <div id="home" class="section active">
+    <div class="banner">SCARY TIMMEH</div>
+    <p style="text-align:center; font-size: 18px;">Scary Timmeh Official Website!</p>
+  </div>
+
+  <div id="download" class="section">
+    <div class="banner">DOWNLOADS</div>
+    <div class="download-box">
+      <img src="https://i.imgur.com/thN5x7t.png" alt="Timmeh Face">
+      <p>The New Official Updated version of Scary Timmeh!</p>
+      <a href="https://noah122121.itch.io/scary-timmeh2" target="_blank">noah122121.itch.io/scary-timmeh2</a>
+      <br /><br />
+      <a href="https://bobcashducky.itch.io/scary-timmeh" target="_blank">bobcashducky.itch.io/scary-timmeh</a>
     </div>
   </div>
-  
-  <!-- YouTube player container -->
-  <div id="youtubeContainer"></div>
-  
-  <div id="credit">Made by Noah</div>
-  
+
+  <div id="info" class="section">
+    <div class="banner">INFORMATION</div>
+    <p style="text-align:center; font-size: 18px;">Scary Timmeh is a game about fear, darkness, and escape. Stay tuned for lore and more.</p>
+  </div>
+
+  <div id="game1" class="section">
+    <div class="banner">SCARY TIMMEH 1</div>
+    <p>
+      The game that started it all — <strong>Scary Timmeh</strong> throws you into a dark, confusing maze… and drops <strong>Timmeh</strong> in there with you.<br><br>
+      No story. No escape. Just you, flickering lights, and the sound of Timmeh’s terrifying footsteps (and possibly screaming). Find the exit before he finds <em>you</em>.
+    </p>
+  </div>
+
   <script>
-    // Global mode: either "file" or "youtube"
-    let sourceMode = "file";
-    let youtubeMode = false; // true if using YouTube link (simulated amplitude)
-    
-    // Variables for file audio analysis:
-    let audio, audioContext, analyser, source;
-    let dataArray, bufferLength;
-    
-    // For simulating YouTube amplitude
-    const fileInput = document.getElementById("fileInput");
-    const youtubeInput = document.getElementById("youtubeInput");
-    const loadYouTubeButton = document.getElementById("loadYouTubeButton");
-    const youtubeContainer = document.getElementById("youtubeContainer");
-    const mouth = document.getElementById("mouth");
-    
-    // When a local file is chosen, switch to file mode and use the Web Audio API.
-    fileInput.addEventListener("change", function() {
-      sourceMode = "file";
-      youtubeMode = false;
-      youtubeContainer.style.display = "none";
-      const file = this.files[0];
-      if (!file) return;
-      const url = URL.createObjectURL(file);
-      
-      if (audio) {
-        audio.pause();
-      }
-      audio = new Audio(url);
-      audio.crossOrigin = "anonymous";
-      audio.loop = true;
-      audio.play();
-      
-      // Set up Web Audio API.
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      bufferLength = analyser.frequencyBinCount;
-      dataArray = new Uint8Array(bufferLength);
-      
-      source = audioContext.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioContext.destination);
-    });
-    
-    // YouTube IFrame API variables.
-    let ytPlayer;
-    function onYouTubeIframeAPIReady() {
-      // We'll create the player when the link is provided.
+    function showPage(id) {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
     }
-    
-    // Load a YouTube video based on the link.
-    loadYouTubeButton.addEventListener("click", function() {
-      const url = youtubeInput.value.trim();
-      if (!url) return;
-      const videoId = extractVideoId(url);
-      if (!videoId) {
-        alert("Invalid YouTube link.");
-        return;
-      }
-      sourceMode = "youtube";
-      youtubeMode = true;
-      youtubeContainer.style.display = "block";
-      
-      if (ytPlayer) {
-        ytPlayer.loadVideoById(videoId);
-      } else {
-        ytPlayer = new YT.Player('youtubeContainer', {
-          height: '170',
-          width: '300',
-          videoId: videoId,
-          playerVars: {
-            autoplay: 1,
-            controls: 1,
-            modestbranding: 1,
-            rel: 0
-          },
-          events: {
-            'onReady': function(e) {
-              e.target.playVideo();
-            }
-          }
-        });
-      }
-    });
-    
-    // Utility: extract YouTube video ID from URL.
-    function extractVideoId(url) {
-      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[7].length === 11) ? match[7] : null;
-    }
-    
-    // Animation loop that updates Tim’s mouth based on audio/simulation.
-    function animate() {
-      requestAnimationFrame(animate);
-      
-      let average = 0;
-      if (!youtubeMode && analyser) {
-        // Local MP3 mode: use actual Web Audio API analysis.
-        analyser.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          sum += dataArray[i];
-        }
-        average = sum / dataArray.length;
-        // Use a more sensitive ratio for MP3 mode to make the mouth open HUGE.
-        // Base factor starts at 1, then add average/18; cap it at 12.
-        let scaleFactor = 1 + (average / 18);
-        scaleFactor = Math.min(scaleFactor, 12.0);
-        const newHeight = 6 * scaleFactor;
-        mouth.style.height = newHeight + "px";
-      } else if (youtubeMode) {
-        // YouTube mode: simulate amplitude using the YouTube player's current time.
-        let currentTime = (ytPlayer && typeof ytPlayer.getCurrentTime === 'function')
-                          ? ytPlayer.getCurrentTime() 
-                          : performance.now() / 1000;
-        // Simulate a beat roughly at 120 BPM (2 beats per second)
-        let beatFrequency = 2;
-        let sineValue = Math.abs(Math.sin(currentTime * Math.PI * beatFrequency));
-        // Base amplitude plus random jitter for dynamic variation.
-        let baseAmplitude = 50 + 30 * sineValue;
-        let randomJitter = Math.random() * 20;
-        average = baseAmplitude + randomJitter;
-        // For YouTube, use a more sensitive ratio as well.
-        let scaleFactor = 1 + (average / 12);
-        scaleFactor = Math.min(scaleFactor, 12.0);
-        const newHeight = 6 * scaleFactor;
-        mouth.style.height = newHeight + "px";
-      }
-    }
-    
-    animate();
   </script>
 </body>
 </html>
